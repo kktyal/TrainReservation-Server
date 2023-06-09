@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project.server.mappers.member.IMemberMapper">
+
+    <insert id="test">
+        insert into `good`.`member_email_auth`
+        values ('test', 'test');
+    </insert>
+
+    <update id="updateEmailAuth">
+        update `good`.member_email_auth
+        set expired_flag = #{isExpired}
+        where `email` = #{email}
+    </update>
+    <insert id="insertAuthCode">
+        insert into `good`.`member_email_auth`
+        values (#{email}, #{authCode}, #{createdOn}, #{expiresOn}, #{isExpired})
+        on duplicate key update `auth_code`= values(`auth_code`),
+                                `created_on`=values(`created_on`),
+                                `expires_on`= values(`expires_on`),
+                                `expired_flag`=values (`expired_flag`);
+    </insert>
+
+    <select id="matchEmailCode" resultType="MemberAuthCodeEntity">
+        select *
+        from `good`.`member_email_auth`
+        where `email` = #{email}
+    </select>
+
+
+    <select id="findById" resultType="MemberVo">
+        select *
+        from `good`.`member`
+        where `id` = #{id}
+    </select>
+
+    <select id="findByEmail" resultType="MemberVo">
+        select *
+        from `good`.`member`
+        where `email` = #{email}
+    </select>
+
+    <select id="findByPhone" resultType="MemberVo">
+        select *
+        from `good`.`member`
+        where `phone` = #{phone}
+    </select>
+
+    <select id="findByEmailAndId" resultType="MemberVo">
+        select *
+        from `good`.`member`
+        where `id` = #{id}
+          and `email` = #{email}
+    </select>
+
+    <update id="updatePw">
+        update `good`.`member`
+        set `pw` = #{pw}
+        where `id` = #{id}
+    </update>
+
+
+    <insert id="save">
+        insert into good.member (`id`, `email`, `phone`, `pw`, `name`, `gender`, `birth`)
+            value (#{id}, #{email}, #{phone}, #{pw}, #{name},#{gender},#{birth})
+    </insert>
+
+
+
+</mapper>
