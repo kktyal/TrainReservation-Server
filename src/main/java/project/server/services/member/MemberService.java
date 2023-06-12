@@ -2,6 +2,7 @@ package project.server.services.member;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import project.Utils;
 import project.server.entities.member.MemberAuthCodeEntity;
@@ -59,11 +60,8 @@ public class MemberService {
         return result != 0 ? "success" : "DataBaseError";
 
     }
-
-
-
     //이메일 인증 비교
-    public Pair<String,Integer> matchEmailCode(MemberAuthCodeEntity memberAuthCodeEntity){
+    public Pair<String,Integer> matchEmailCodeAndGiveId(MemberAuthCodeEntity memberAuthCodeEntity){
         Optional<MemberAuthCodeEntity> selectVo = memberMapper.matchEmailCode(memberAuthCodeEntity.getEmail());
         Pair<String, Integer> pair = new Pair("","");
         if(selectVo.isEmpty()){
@@ -83,6 +81,28 @@ public class MemberService {
         }else{
             pair.setKey("CodeFail");
             return pair;
+        }
+
+    }
+
+
+    //이메일 인증 비교
+    public String matchEmailCode(MemberAuthCodeEntity memberAuthCodeEntity){
+        Optional<MemberAuthCodeEntity> selectVo = memberMapper.matchEmailCode(memberAuthCodeEntity.getEmail());
+
+        if(selectVo.isEmpty()){
+            return "EmailFail";
+        }else if(selectVo.get().getExpiresOn().compareTo(new Date()) < 0){
+            selectVo.get().setExpired(true);
+            memberMapper.updateEmailAuth(selectVo.get());
+            return "expired";
+
+        }else if(selectVo.get().getAuthCode().equals(memberAuthCodeEntity.getAuthCode())){
+            Optional<MemberVo> user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail());
+
+            return "success";
+        }else{
+            return "CodeFail";
         }
 
     }

@@ -72,8 +72,10 @@ public class MemberController {
     @PostMapping("/findId/matchEmailCode")
     public String emailCheckByFindId(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity, HttpServletRequest request) throws SQLException {
 
-        String result = memberService.matchEmailCode(memberAuthCodeEntity);
-        JSONObject object = getJsonObject(result);
+        Pair<String, Integer> pair = memberService.matchEmailCodeAndGiveId(memberAuthCodeEntity);
+        JSONObject object = new JSONObject();
+        object.put("result",pair.getKey());
+        object.put("data",pair.getValue());
         // 이메일 세션 안함!!
 //        if (result.equals("success")) {
 //            // 세션이 있으면 세션 반환, 세션이 없으면 신규 세션 생성
