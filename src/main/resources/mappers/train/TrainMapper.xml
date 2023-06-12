@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project.server.mappers.train.ITrainMapper">
+
+    <select id="test" resultType="int">
+        select `index`
+        from `good`.`train_station`
+        where `station_name` = '수서'
+    </select>
+
+    <select id="findByName" resultType="TrainStationEntity">
+        select `index`, `station_name`, `station_code`
+        from `good`.`train_station`
+        where `station_name` = #{name}
+    </select>
+
+    <update id="updateDisuse">
+            update good.`reservation` set `disuse` = 1 where expired_date &lt; #{nowDate}
+        and `reservation_id` NOT IN (SELECT `reservation_id` FROM good.`payment` WHERE `reservation_id` IS NOT NULL)
+    </update>
+    <select id="findSoldSeat" resultType="ReservationVo">
+        select `r`.`depart_time`,
+               `r`.`depart_station`,
+               `r`.`arrive_time`,
+               `r`.`depart_station`,
+               `r`.`date`,
+               `t`.`train_no`,
+               `t`.`carriage`,
+               `t`.`seat`
+        from `good`.`reservation` as `r`
+                 inner join `good`.`ticket` `t` on `r`.`reservation_id` = `t`.`reservation_id`
+        where `t`.`train_no` = #{trainno}
+          and `r`.`disuse` = 0
+          and `r`.`date` = str_to_date('20230612', '%Y%m%d')
+          and `r`.`depart_time` &lt;= str_to_date('100000', '%H%i%s')
+          and `r`.`arrive_time` &gt;= str_to_date('070000', '%H%i%s');
+    </select>
+
+    <select id="selectTime" resultType="TrainTimeVo">
+        select `t`.`train_no`, `t2`.`station_name` , `t`.`depart_at`
+        from `good`.`train_time` as `t`
+        left join `good`.`train_station` as `t2` on `t`.`train_station_index` = `t2`.`index`
+        where `train_no` = #{trainNo}
+
+        <if test="trainNo % 2 == 0">
+            order by `train_station_index` desc
+        </if>
+
+    </select>
+    <select id="selectCharge" resultType="TrainChargeEntity">
+        select `charge`,`charge_vip`
+        from `good`.`train_charge`
+        <where>
+            <if test="depart &lt; arrive">
+                and depart = #{depart} and arrive = #{arrive}
+            </if>
+            <if test="depart  &gt; arrive">
+                 and depart = #{arrive} and arrive = #{depart}
+            </if>
+        </where>
+    </select>
+
+    <select id="duplicatedMemberId" resultType="int">
+        select `reservation_id`
+        from `good`.`reservation`
+        where `reservation_id` = #{id}
+    </select>
+    <select id="duplicatedTicketId" resultType="int">
+        select `ticket_id`
+        from `good`.`ticket`
+        where `ticket_id` = #{id}
+    </select>
+
+    <insert id="saveReservation">
+        insert into `good`.`reservation` (`reservation_id`, `depart_time`, `depart_station`, `arrive_time`,
+                                          `arrive_station`, `date`, `expired_date`, `member_id`, `disuse`)
+        values (#{reservationId}, #{departTime}, #{departStation}, #{arriveTime}, #{arriveStation}, #{date},
+                #{expiredDate}, #{memberId}, #{disuse})
+    </insert>
+    <insert id="saveTicket">
+        insert into `good`.`ticket`
+        values (#{ticketId}, #{trainNo}, #{carriage}, #{seat}, #{reservationId})
+    </insert>
+
+</mapper>
+

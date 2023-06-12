@@ -2,10 +2,10 @@ package project.server.services.member;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import project.Utils;
 import project.server.entities.member.MemberAuthCodeEntity;
+import project.server.lang.Pair;
 import project.server.mappers.member.IMemberMapper;
 import project.server.vos.member.MemberVo;
 
@@ -63,20 +63,26 @@ public class MemberService {
 
 
     //이메일 인증 비교
-    public String matchEmailCode(MemberAuthCodeEntity memberAuthCodeEntity){
+    public Pair<String,Integer> matchEmailCode(MemberAuthCodeEntity memberAuthCodeEntity){
         Optional<MemberAuthCodeEntity> selectVo = memberMapper.matchEmailCode(memberAuthCodeEntity.getEmail());
-
+        Pair<String, Integer> pair = new Pair("","");
         if(selectVo.isEmpty()){
-            return "EmailFail";
+            pair.setKey("EmailFail");
+            return pair;
         }else if(selectVo.get().getExpiresOn().compareTo(new Date()) < 0){
             selectVo.get().setExpired(true);
             memberMapper.updateEmailAuth(selectVo.get());
-            return "expired";
+            pair.setKey("expired");
+            return pair;
 
         }else if(selectVo.get().getAuthCode().equals(memberAuthCodeEntity.getAuthCode())){
-            return "success";
+            Optional<MemberVo> user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail());
+            pair.setKey("success");
+            pair.setValue(user.get().getId());
+            return pair;
         }else{
-            return "CodeFail";
+            pair.setKey("CodeFail");
+            return pair;
         }
 
     }
@@ -157,8 +163,11 @@ public class MemberService {
         return result != 0 ? "success" : "DataBaseError";
     }
 
-    public String login(MemberVo memberVo){
+    public Pair<String, MemberVo> login(MemberVo memberVo){
         memberVo.setPw(Utils.hashSha512(memberVo.getPw()));
+
+
+        Pair<String, MemberVo> pair = new Pair<>("",null);
 
         Optional<MemberVo> selectVo;
         if(memberVo.getId()!=null){
@@ -168,16 +177,23 @@ public class MemberService {
         }else if(memberVo.getEmail()!=null) {
             selectVo = memberMapper.findByEmail(memberVo.getEmail());
         }else {
-            return "Bad Request";
+            pair.setKey("Bad Request");
+            return pair;
         }
         if (selectVo.isEmpty()){
-            return "아이디 없다";
+            pair.setKey("No Id");
+            return pair;
         }
-        System.out.println( memberVo.getPw());
-        System.out.println( selectVo.get().getPw());
 
 
-        return selectVo.get().getPw().equals(memberVo.getPw()) ? "success" : "fail";
+        if (selectVo.get().getPw().equals(memberVo.getPw())) {
+            pair.setKey("success");
+            pair.setValue(selectVo.get());
+        } else {
+            pair.setKey("fail");
+        }
+        return pair;
+
     }
 
 }

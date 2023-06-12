@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import project.server.SessionConst;
 import project.server.entities.member.MemberAuthCodeEntity;
+import project.server.lang.Pair;
 import project.server.services.member.MemberService;
 import project.server.vos.member.MemberVo;
 
@@ -146,14 +147,15 @@ public class MemberController {
     @PostMapping("/login")
     public String login(@RequestBody MemberVo memberVo, HttpServletRequest request) throws SQLException {
 
-        String result = memberService.login(memberVo);
-        if(result.equals("success")){
+        Pair<String, MemberVo> login = memberService.login(memberVo);
+        if(login.getKey().equals("success")){
             HttpSession session = request.getSession(true);
-            memberVo.setPw("");
-            session.setAttribute(SessionConst.LOGIN_MEMBER,memberVo);
+            login.getValue().setPw("");
+            session.setAttribute(SessionConst.LOGIN_MEMBER,login.getValue());
         }
+        System.out.println(login.getValue().getId());
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
-        JSONObject object = getJsonObject(result);
+        JSONObject object = getJsonObject(login.getKey());
         return object.toString();
     }
 
