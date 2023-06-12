@@ -16,7 +16,7 @@ import project.server.vos.member.MemberVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.sql.SQLException;
+
 
 @Slf4j
 @Controller
@@ -53,7 +53,7 @@ public class MemberController {
     //회원가입 이메일 인증 코드 확인
     @ResponseBody
     @PostMapping("/register/matchEmailCode")
-    public String emailCheckByRegister(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity, HttpServletRequest request) throws SQLException {
+    public String emailCheckByRegister(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
 
         String result = memberService.matchEmailCode(memberAuthCodeEntity);
         JSONObject object = getJsonObject(result);
@@ -70,13 +70,13 @@ public class MemberController {
     //아이디 찾기 이메일 인증 코드 확인
     @ResponseBody
     @PostMapping("/findId/matchEmailCode")
-    public String emailCheckByFindId(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity, HttpServletRequest request) throws SQLException {
+    public String emailCheckByFindId(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
 
         Pair<String, Integer> pair = memberService.matchEmailCodeAndGiveId(memberAuthCodeEntity);
         JSONObject object = new JSONObject();
         object.put("result",pair.getKey());
         object.put("data",pair.getValue());
-        // 이메일 세션 안함!!
+        // 이메일 세션 안함!!1
 //        if (result.equals("success")) {
 //            // 세션이 있으면 세션 반환, 세션이 없으면 신규 세션 생성
 //            HttpSession session = request.getSession(true);
@@ -89,7 +89,7 @@ public class MemberController {
     //비밀번호 변경 이메일 인증 코드 확인
     @ResponseBody
     @PostMapping("/updatePw/matchEmailCode")
-    public String emailCheckByupdatePw(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity, HttpServletRequest request) throws SQLException {
+    public String emailCheckByupdatePw(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity)  {
 
         String result = memberService.matchEmailCode(memberAuthCodeEntity);
         JSONObject object = getJsonObject(result);
@@ -107,7 +107,7 @@ public class MemberController {
     //회원가입
     @ResponseBody
     @PostMapping("/register")
-    public String register(@RequestBody MemberVo memberVo) throws  SQLException {
+    public String register(@RequestBody MemberVo memberVo) {
         log.info("hello");
         String result = memberService.register(memberVo);
         JSONObject object = getJsonObject(result);
@@ -116,7 +116,7 @@ public class MemberController {
 
     @ResponseBody
     @PostMapping("/isDuplication/phone")
-    public String isDuplicationPhone(@RequestBody MemberVo memberVo) throws SQLException {
+    public String isDuplicationPhone(@RequestBody MemberVo memberVo)  {
         // 중복 확인
         String result = memberService.isDuplicationPhone(memberVo);
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
@@ -126,7 +126,7 @@ public class MemberController {
 
     @ResponseBody
     @PostMapping("/isDuplication/email")
-    public String isDuplicationEmail(@RequestBody MemberVo memberVo) throws SQLException {
+    public String isDuplicationEmail(@RequestBody MemberVo memberVo) {
         // 중복 확인
         String result = memberService.isDuplicationEmail(memberVo);
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
@@ -137,7 +137,7 @@ public class MemberController {
     //비번 변경
     @ResponseBody
     @PostMapping("/updatePw/applyNewPw")
-    public String updatePw(@RequestBody MemberVo memberVo) throws SQLException {
+    public String updatePw(@RequestBody MemberVo memberVo) {
 
         String result = memberService.updatePw(memberVo);
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
@@ -147,7 +147,7 @@ public class MemberController {
     //로그인
     @ResponseBody
     @PostMapping("/login")
-    public String login(@RequestBody MemberVo memberVo, HttpServletRequest request) throws SQLException {
+    public String login(@RequestBody MemberVo memberVo, HttpServletRequest request) {
 
         Pair<String, MemberVo> login = memberService.login(memberVo);
         if(login.getKey().equals("success")){
