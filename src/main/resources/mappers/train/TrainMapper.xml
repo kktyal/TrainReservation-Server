@@ -3,12 +3,21 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="project.server.mappers.train.ITrainMapper">
-
     <select id="test" resultType="int">
         select `index`
         from `good`.`train_station`
         where `station_name` = '수서'
     </select>
+
+
+
+    <select id="selectTicketByReservationId" resultType="TicketEntity">
+        select *
+        from `good`.`ticket`
+        where `reservation_id` = #{reservationId}
+    </select>
+
+
 
     <select id="findByName" resultType="TrainStationEntity">
         select `index`, `station_name`, `station_code`
@@ -16,15 +25,42 @@
         where `station_name` = #{name}
     </select>
 
-    <update id="updateDisuse">
-            update good.`reservation` set `disuse` = 1 where expired_date &lt; #{nowDate}
-        and `reservation_id` NOT IN (SELECT `reservation_id` FROM good.`payment` WHERE `reservation_id` IS NOT NULL)
+
+    <update id="updateDisuse"><![CDATA[
+        update `good`.`reservation`
+        set `disuse` = 1
+        where `reservation_id` not in (
+            select `r`.`reservation_id`
+            from `good`.`reservation` as `r`
+                left join `good`.`payment` as `p` on `p`.`payment_id` = `r`.`payment_id`
+            where (`r`.`payment_id` is not null and `p`.`refund` = 0)
+               or (`r`.`payment_id` is null and `expired_date` > #{nowDate})
+            )
+        ]]></update>
+
+    <update id="updateReservationPaymentId">
+        update `good`.`reservation`
+        set `payment_id` = #{paymentId}
+        where `reservation_id` =#{reservationId}
     </update>
-    <select id="findSoldSeat" resultType="ReservationVo">
+
+    <update id="updateRefundToPayment">
+        update `good`.`payment`
+        set `refund` = 1
+        where `payment_id` = #{paymentId}
+    </update>
+    <update id="updateCancelToReservation">
+        update `good`.`reservation`
+        set `disuse` = 1
+        where `reservation_id` = #{reservationId}
+    </update>
+
+
+    <select id="findSoldSeat" resultType="ReservationVo"><![CDATA[
         select `r`.`depart_time`,
                `r`.`depart_station`,
                `r`.`arrive_time`,
-               `r`.`depart_station`,
+               `r`.`arrive_station`,
                `r`.`date`,
                `t`.`train_no`,
                `t`.`carriage`,
@@ -33,10 +69,10 @@
                  inner join `good`.`ticket` `t` on `r`.`reservation_id` = `t`.`reservation_id`
         where `t`.`train_no` = #{trainno}
           and `r`.`disuse` = 0
-          and `r`.`date` = str_to_date('20230612', '%Y%m%d')
-          and `r`.`depart_time` &lt;= str_to_date('100000', '%H%i%s')
-          and `r`.`arrive_time` &gt;= str_to_date('070000', '%H%i%s');
-    </select>
+          and `r`.`date` = #{date}
+          and `r`.`depart_time` <= #{arrplandtime}
+          and `r`.`arrive_time` >= #{depplandtime}
+        ]]></select>
 
     <select id="selectTime" resultType="TrainTimeVo">
         select `t`.`train_no`, `t2`.`station_name` , `t`.`depart_at`
@@ -62,16 +98,22 @@
         </where>
     </select>
 
-    <select id="duplicatedMemberId" resultType="int">
-        select `reservation_id`
+    <select id="selectReservationId" resultType="ReservationEntity">
+        select *
         from `good`.`reservation`
         where `reservation_id` = #{id}
     </select>
-    <select id="duplicatedTicketId" resultType="int">
-        select `ticket_id`
+    <select id="selectTicketId" resultType="TicketEntity">
+        select *
         from `good`.`ticket`
         where `ticket_id` = #{id}
     </select>
+    <select id="selectPaymentId" resultType="PaymentEntity">
+        select *
+        from `good`.`payment`
+        where `payment_id` = #{id}
+    </select>
+
 
     <insert id="saveReservation">
         insert into `good`.`reservation` (`reservation_id`, `depart_time`, `depart_station`, `arrive_time`,
@@ -81,8 +123,63 @@
     </insert>
     <insert id="saveTicket">
         insert into `good`.`ticket`
-        values (#{ticketId}, #{trainNo}, #{carriage}, #{seat}, #{reservationId})
+        values (#{ticketId}, #{trainNo}, #{carriage}, #{seat}, #{reservationId},#{age},#{price})
     </insert>
+    <insert id="savePayment">
+        insert into `good`.`payment`(`payment_id`,`total_price`)
+        values (#{paymentId},#{totalPrice})
+    </insert>
+
+    <select id="duplicatedTicket" resultType="ReservationVo"><![CDATA[
+        select *
+        from `good`.`reservation` as `r`
+                 inner join
+             `good`.`ticket` as `t` on `r`.`reservation_id` = `t`.`reservation_id`
+        where `train_no` = #{trainNo}
+          and `carriage` = #{carriage}
+          and `seat` = #{seat}
+          and `r`.`date` = #{date}
+          and `r`.`depart_time` <= #{arriveTime}
+          and `r`.`arrive_time` >= #{departTime}
+          and `disuse` = 0
+        ]]></select>
+
+    <select id="showReservation" resultType="ReservationVo">
+        select `r`.`depart_station`,
+               `r`.`depart_time`,
+               `r`.`arrive_station`,
+               `r`.`arrive_time`,
+               `r`.`date`,
+               `r`.`reservation_id`,
+               `t`.`train_no`,
+               `t`.`carriage`,
+               `t`.`seat`,
+               `t`.`age`,
+               `t`.`price`,
+               `t`.`ticket_id`
+        from `good`.`reservation` as `r`
+                 inner join `good`.`ticket` as `t` on `r`.`reservation_id` = `t`.`reservation_id`
+        where `r`.`reservation_id` = #{reservationId}
+          and `r`.`disuse` = 0
+
+    </select>
+    <select id="selectReservationByMemberId" resultType="ReservationVo">
+        select `r`.`date`,
+               `r`.`arrive_station`,
+               `r`.`arrive_time`,
+               `r`.`depart_station`,
+               `r`.`depart_time`,
+               `r`.`expired_date`,
+               count(`t`.`seat`) as ticketCnt,
+               `t`.`train_no`
+        from `good`.`reservation` as `r`
+                 left join `good`.`ticket` as `t` on `r`.`reservation_id` = `t`.`reservation_id`
+        where `r`.`member_id` = #{memberId}
+          and `r`.`disuse` = 0
+        group by `r`.`reservation_id`
+
+    </select>
+
 
 </mapper>
 

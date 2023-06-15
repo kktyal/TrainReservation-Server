@@ -11,3 +11,4 @@ public class InquiryVo {
     private int kid;
     private int old;
 }
+

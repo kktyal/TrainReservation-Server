@@ -74,9 +74,9 @@ public class MemberService {
             return pair;
 
         }else if(selectVo.get().getAuthCode().equals(memberAuthCodeEntity.getAuthCode())){
-            Optional<MemberVo> user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail());
+            MemberVo user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail()).get();
             pair.setKey("success");
-            pair.setValue(user.get().getId());
+            pair.setValue(user.getId());
             return pair;
         }else{
             pair.setKey("CodeFail");

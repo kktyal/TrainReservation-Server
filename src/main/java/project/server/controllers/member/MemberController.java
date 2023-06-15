@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/member")
 public class MemberController {
 
+    @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
     @Autowired
     private MemberService memberService;
 
@@ -88,7 +89,7 @@ public class MemberController {
     //비밀번호 변경 이메일 인증 코드 확인
     @ResponseBody
     @PostMapping("/updatePw/matchEmailCode")
-    public String emailCheckByupdatePw(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity)  {
+    public String emailCheckByUpdatePw(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity)  {
 
         String result = memberService.matchEmailCode(memberAuthCodeEntity);
         JSONObject object = getJsonObject(result);

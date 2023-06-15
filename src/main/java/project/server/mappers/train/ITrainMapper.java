@@ -1,10 +1,7 @@
 package project.server.mappers.train;
 
 import org.apache.ibatis.annotations.Mapper;
-import project.server.entities.train.ReservationEntity;
-import project.server.entities.train.TicketEntity;
-import project.server.entities.train.TrainChargeEntity;
-import project.server.entities.train.TrainStationEntity;
+import project.server.entities.train.*;
 import project.server.vos.train.*;
 
 import java.util.Date;
@@ -17,15 +14,32 @@ public interface ITrainMapper {
     Optional<TrainStationEntity>findByName(String name);
 
     List<ReservationVo> findSoldSeat(ApiVo apiVo);
+
+
     int updateDisuse(Date nowDate);
+    int updateReservationPaymentId(ReservationEntity entity);
 
 
     List<TrainTimeVo> selectTime(int trainNo);
-
     Optional<TrainChargeEntity> selectCharge(TrainChargeVo trainChargeVo);
 
-    Optional<ReservationEntity> duplicatedMemberId(String id);
-    Optional<ReservationEntity> duplicatedTicketId(String id);
+    List<ReservationVo>duplicatedTicket(ReservationVo vo);
+
+    Optional<ReservationEntity> selectReservationId(String id);
+    Optional<TicketEntity> selectTicketId(String id);
+    Optional<PaymentEntity> selectPaymentId(String id);
+
+    List<ReservationVo> showReservation(String reservationId);
+    List<ReservationVo> selectReservationByMemberId (Integer memberId);
+
     int saveReservation(ReservationEntity reservation);
     int saveTicket(TicketEntity ticket);
+    int savePayment(PaymentEntity payment);
+
+    List<TicketEntity> selectTicketByReservationId(String reservationId);
+
+    int updateRefundToPayment(String paymentId);
+
+    int updateCancelToReservation(String reservationId);
+
 }

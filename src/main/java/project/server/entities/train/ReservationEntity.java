@@ -14,5 +14,6 @@ public class ReservationEntity {
     private String date;
     private Date expiredDate;
     private Integer memberId;
-    private boolean disuse;
+    private Boolean disuse;
+    private String paymentId;
 }

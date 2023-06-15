@@ -7,10 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.server.entities.train.ReservationEntity;
-import project.server.entities.train.TicketEntity;
-import project.server.entities.train.TrainChargeEntity;
-import project.server.entities.train.TrainStationEntity;
+import project.server.entities.train.*;
 import project.server.mappers.train.ITrainMapper;
 import project.server.vos.train.*;
 
@@ -18,11 +15,13 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Date;
+
+import project.server.lang.Pair;
 
 @Service
 @Slf4j
@@ -33,54 +32,120 @@ public class TrainService {
         this.trainMapper = trainMapper;
     }
 
+
     public Optional<ReservationEntity> test() {
         LocalDate currentDate = LocalDate.now();
         UUID uuid = UUID.randomUUID();
         String random = currentDate.toString().concat(uuid.toString());
         System.out.println(random);
-        return trainMapper.duplicatedMemberId("20230613");
+        return trainMapper.selectReservationId("20230613");
     }
 
+    public int cancel(ReservationVo inputVo){
+        return trainMapper.updateCancelToReservation(inputVo.getReservationId());
+    }
+    public int refund(ReservationVo inputVo){
+        ReservationEntity reservation = trainMapper.selectReservationId(inputVo.getReservationId()).get();
+        return trainMapper.updateRefundToPayment(reservation.getPaymentId());
+    }
+    @Transactional
+    public int payment(ReservationEntity reservationEntity){
+
+        PaymentEntity payment = new PaymentEntity();
+
+        // 총 금액을 알기 위해 ticket에서 age, price 조회
+        int totalPrice = 0 ;
+        List<TicketEntity> ticketEntities = trainMapper.selectTicketByReservationId(reservationEntity.getReservationId());
+        for (TicketEntity ticketEntity : ticketEntities) {
+            if (ticketEntity.getAge().equals("adult")){
+                totalPrice+= ticketEntity.getPrice();
+            }else if (ticketEntity.getAge().equals("old")){
+                totalPrice+= (int)ticketEntity.getPrice()*0.8;
+            }else{
+                totalPrice+= (int)ticketEntity.getPrice()*0.7;
+            }
+        }
+        payment.setTotalPrice((int)Math.floor(totalPrice/100) * 100);
+
+        // paymentid 세팅
+        String paymentId;
+        do {
+            paymentId = createId();
+        } while (!trainMapper.selectPaymentId(paymentId).isEmpty());
+        payment.setPaymentId(paymentId);
+        System.out.println("paymentId = " + paymentId);
+        System.out.println("totalPrice = " + totalPrice);
+
+        int savePaymentResult = trainMapper.savePayment(payment);
+
+        reservationEntity.setPaymentId(paymentId);
+        int updateReservationPaymentIdResult = trainMapper.updateReservationPaymentId(reservationEntity);
+        if(savePaymentResult ==1 && updateReservationPaymentIdResult == 1){
+            return 1;
+        }
+        else return 0;
+
+
+    }
     public String createId() {
         LocalDate currentDate = LocalDate.now();
         UUID uuid = UUID.randomUUID();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String result = currentDate.format(formatter).concat(uuid.toString()).replaceAll("-","");;
+        String result = currentDate.format(formatter).concat(uuid.toString()).replaceAll("-", "");
+
         return result;
     }
-
-
     @Transactional
-    public int reservation(List<ReservationVo> reservationVo) {
+    public Pair<String, Integer> reservation(List<ReservationVo> reservationVo, InquiryVo count) {
+
+        Pair<String, Integer> pair = new Pair<>(null, null);
+        //검증
+        for (ReservationVo vo : reservationVo) {
+            if (trainMapper.duplicatedTicket(vo).size() != 0) {
+                pair.setValue(-1);
+                return pair;
+            }
+        }
+
         // reservation_id 생성
         String reservationId;
         do {
             reservationId = createId();
-        } while (!trainMapper.duplicatedMemberId(reservationId).isEmpty());
+        } while (!trainMapper.selectReservationId(reservationId).isEmpty());
         // 만료 날짜 생성
-        Date date = new Date();
-        date = DateUtils.addMinutes(date, 10);
+        Date expiredDate = new Date();
+        expiredDate = DateUtils.addMinutes(expiredDate, 10);
 
+        //예약
         ReservationVo vo = reservationVo.get(0);
         ReservationEntity reservation = new ReservationEntity();
-        reservation.setReservationId(reservationId);
-        reservation.setDepartTime(vo.getDepartTime());
-        reservation.setDepartStation(vo.getDepartStation());
-        reservation.setArriveTime(vo.getArriveTime());
-        reservation.setArriveStation(vo.getArriveStation());
-        reservation.setDate(vo.getDate());
-        reservation.setExpiredDate(date);
-        reservation.setMemberId(vo.getMemberId());
-        System.out.println("vo.getMemberId() = " + vo.getMemberId());
-        System.out.println("reservation.getMemberId() = " + reservation.getMemberId());
-        reservation.setDisuse(false);
-        int reservationCnt = trainMapper.saveReservation(reservation);
+        vo.setReservationId(reservationId);
+        vo.setExpiredDate(expiredDate);
+
+
+        vo.setDisuse(false);
+        int reservationCnt = trainMapper.saveReservation(vo);
+
+
+        TrainChargeVo charge = new TrainChargeVo();
+        charge.setArriveName(vo.getArriveStation());
+        charge.setDepartName(vo.getDepartStation());
+
+
+        //티켓
+        TrainChargeEntity trainChargeEntity = selectCharge(charge).get();
+
+        int adultCnt = count.getAdult();
+        int oldCnt = count.getOld();
+        int kidCnt = count.getKid();
+
+
         int ticketCnt = 0;
         for (ReservationVo seat : reservationVo) {
             String ticketId;
             do {
                 ticketId = createId();
-            } while (!trainMapper.duplicatedTicketId(ticketId).isEmpty());
+            } while (!trainMapper.selectTicketId(ticketId).isEmpty());
 
             TicketEntity ticket = new TicketEntity();
             ticket.setTicketId(ticketId);
@@ -88,12 +153,68 @@ public class TrainService {
             ticket.setCarriage(seat.getCarriage());
             ticket.setSeat(seat.getSeat());
             ticket.setReservationId(reservationId);
+            if (ticket.getCarriage() == 2) {
+                ticket.setPrice(trainChargeEntity.getChargeVip());
+                if (adultCnt > 0) {
+                    ticket.setAge("adult");
+
+                    adultCnt--;
+                } else if (oldCnt > 0) {
+                    ticket.setAge("old");
+
+                    oldCnt--;
+                } else {
+                    ticket.setAge("kid");
+
+                }
+            } else {
+                ticket.setPrice(trainChargeEntity.getCharge());
+                if (adultCnt > 0) {
+                    ticket.setAge("adult");
+
+                    adultCnt--;
+                } else if (oldCnt > 0) {
+                    ticket.setAge("old");
+
+                    oldCnt--;
+                } else {
+                    ticket.setAge("kid");
+
+                }
+            }
             ticketCnt += trainMapper.saveTicket(ticket);
         }
-
-        return reservationCnt+ticketCnt;
+        pair.setKey(reservationId);
+        pair.setValue(reservationCnt + ticketCnt);
+        return pair;
     }
+    public List<ReservationVo>reservationRefundPage (ReservationEntity input){
+        List<ReservationVo> resultVo = trainMapper.showReservation(input.getReservationId());
+        System.out.println("inputVo.getReservationId() = " + input.getReservationId());
+        for (ReservationVo vo : resultVo) {
+            vo.setTicketId(null);
+            vo.setTrainNo(null);
+        }
+        return resultVo;
+    }
+    public List<ReservationVo>reservationDetail (ReservationEntity input){
+        List<ReservationVo> resultVo = trainMapper.showReservation(input.getReservationId());
+        System.out.println("inputVo.getReservationId() = " + input.getReservationId());
+        for (ReservationVo vo : resultVo) {
+            vo.setTicketId(null);
+        }
+        return resultVo;
+    }
+    public List<ReservationVo> ticketDetail(ReservationVo inputVo){
+        System.out.println("inputVo.getR = " + inputVo.getReservationId());
+        return trainMapper.showReservation(inputVo.getReservationId());
 
+    }
+    @Transactional
+    public List<ReservationVo> selectReservationListsByMemberId(Integer memberId){
+        disuse();
+        return trainMapper.selectReservationByMemberId(memberId);
+    }
     public Optional<TrainChargeEntity> selectCharge(TrainChargeVo chargeVo) {
         chargeVo.setDepart(transferStationName(chargeVo.getDepartName()).getIndex());
         chargeVo.setArrive(transferStationName(chargeVo.getArriveName()).getIndex());
@@ -101,8 +222,6 @@ public class TrainService {
         return trainMapper.selectCharge(chargeVo);
 
     }
-
-
     public List<TrainTimeVo> selectTime(int srtNo) {
         List<TrainTimeVo> trainTimeEntities = trainMapper.selectTime(srtNo);
         System.out.println("trainTimeEntities.size() = " + trainTimeEntities.size());
@@ -110,12 +229,20 @@ public class TrainService {
 
         return trainTimeEntities;
     }
-
+    @Transactional
+    public List<ReservationVo> selectSeat(ReservationVo vo){
+        disuse();
+        ApiVo apiVo =new ApiVo();
+        apiVo.setTrainno(vo.getTrainNo());
+        apiVo.setDate(vo.getDate());
+        apiVo.setDepplandtime(vo.getDepartTime());
+        apiVo.setArrplandtime(vo.getArriveTime());
+        return trainMapper.findSoldSeat(apiVo);
+    }
     public int disuse() {
         Date now = new Date();
         return trainMapper.updateDisuse(now);
     }
-
     @Transactional
     public List<ApiVo> api(InquiryVo inquiryVo) throws IOException {
         List<ApiVo> api = getApi(inquiryVo);
@@ -143,15 +270,12 @@ public class TrainService {
             }
         }
 
-
         return api;
     }
-
     public TrainStationEntity transferStationName(String stationName) {
         System.out.println(stationName);
         return trainMapper.findByName(stationName).get();
     }
-
     public List<ApiVo> getApi(InquiryVo inquiryVo) throws IOException {
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=ovMDJk4e%2BY2bRcCR4qJTYDuTlnmFIMOPMmZsPd1rbUJylcSo%2FUyXnFaJWPu1yt4M1ZdnTfH20zVHD91u9HQt1Q%3D%3D"); /*Service Key*/

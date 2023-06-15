@@ -9,4 +9,6 @@ public class TicketEntity {
     private int carriage;
     private String seat;
     private String reservationId;
+    private String age;
+    private int price;
 }
