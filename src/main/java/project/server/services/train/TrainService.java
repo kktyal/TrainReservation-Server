@@ -271,14 +271,12 @@ public class TrainService {
     @Transactional
     public Pair<Enum<? extends IResult>, List<ApiVo>> api(CntVo cntVo) throws IOException {
         Pair<Enum<? extends IResult>, List<ApiVo>> pair = new Pair<>(CommonResult.SUCCESS, null);
-        List<ApiVo> api;
-        try {
-            api = getApi(cntVo);
-        } catch (Exception e) {
-            pair.setKey(TrainResult.API_ERROR);
-            throw new NullPointerException();
-//            return pair;
-        }
+        List<ApiVo> api = getApi(cntVo);
+//        try {
+//            api = getApi(cntVo);
+//        } catch (Exception e) {
+//           throw new IOException();
+//        }
 
         if (api.size() == 0) {
             pair.setKey(TrainResult.NO_SUCH_ELEMENT);

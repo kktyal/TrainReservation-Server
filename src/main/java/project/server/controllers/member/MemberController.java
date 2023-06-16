@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import project.Validator;
 import project.server.SessionConst;
 import project.server.entities.member.MemberAuthCodeEntity;
+import project.server.entities.member.MemberEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
+import project.server.enums.member.SessionAuthorizedResult;
 import project.server.lang.Pair;
 import project.server.services.member.MemberService;
 import project.server.vos.member.MemberVo;
@@ -191,6 +193,32 @@ public class MemberController {
         return getJsonObject(result.getKey()).toString();
     }
 
+    @ResponseBody
+    @PostMapping("/authorized")
+    public String testSession(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if(session == null){
+            return getJsonObject(SessionAuthorizedResult.NO_SESSION).toString();
+        }
+
+        Object temp = null;
+        try {
+            temp = session.getAttribute(SessionConst.LOGIN_MEMBER);
+        } catch (IllegalStateException e) {
+            return getJsonObject(SessionAuthorizedResult.SESSION_EXPIRED).toString();
+        }
+        if (temp == null) {
+            return getJsonObject(SessionAuthorizedResult.SESSION_EXPIRED).toString();
+        }
+        if (!(temp instanceof MemberEntity)) {
+            return getJsonObject(SessionAuthorizedResult.SESSION_EXPIRED).toString();
+        }
+
+        return Validator.isValid((MemberVo) temp, "id")
+                ? getJsonObject(CommonResult.SUCCESS).toString()
+                : getJsonObject(SessionAuthorizedResult.SESSION_EXPIRED).toString();
+    }
 
     private static JSONObject getJsonObject(Enum<? extends IResult> result) {
         JSONObject object = new JSONObject();
@@ -202,27 +230,9 @@ public class MemberController {
             object.put("message", result.name().toLowerCase());
         }
 
-//        object.put("result", result.name().toLowerCase());
-//        object.put("message", result.equals(CommonResult.SUCCESS)? result.message() : null);
         return object;
     }
 
-    @ResponseBody
-    @PostMapping("/authorized")
-    public String testSession(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        Object temp = session.getAttribute(SessionConst.LOGIN_MEMBER);
-        if (temp == null) {
-            return getJsonObject(CommonResult.FAILURE).toString();
-        }
-        if (temp instanceof MemberVo) {
-            return getJsonObject(CommonResult.FAILURE).toString();
-        }
-
-        return Validator.isValid((MemberVo) temp, "id")
-                ? getJsonObject(CommonResult.SUCCESS).toString()
-                : getJsonObject(CommonResult.FAILURE).toString();
-    }
 
     @ExceptionHandler
     public String nullPointException(Exception e) {

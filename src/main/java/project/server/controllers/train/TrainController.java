@@ -2,6 +2,8 @@ package project.server.controllers.train;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import project.server.SessionConst;
@@ -17,10 +19,8 @@ import project.server.vos.train.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.lang.invoke.MethodHandles;
+import java.util.*;
 
 import static project.Validator.isValidInteger;
 import static project.Validator.isValidString;
@@ -44,9 +44,9 @@ public class TrainController {
     //Output : 기차 조회 결과
     @ResponseBody
     @PostMapping("/inquiry")
-    public String inquiry(@RequestBody CntVo cntVo, HttpServletRequest request) throws IOException {
+    public String inquiry(@RequestBody CntVo cntVo, HttpServletRequest request) throws Throwable {
 
-        if (!isValidString(cntVo.getArriveStation()) || !isValidString(cntVo.getDepartStation())|| !isValidString(cntVo.getDate())) {
+        if (!isValidString(cntVo.getArriveStation()) || !isValidString(cntVo.getDepartStation()) || !isValidString(cntVo.getDate())) {
             return getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -55,7 +55,7 @@ public class TrainController {
 
         Pair<Enum<? extends IResult>, List<ApiVo>> api = trainService.api(cntVo);
 
-        return getJsonObject(api.getKey(),api.getValue()).toString();
+        return getJsonObject(api.getKey(), api.getValue()).toString();
     }
 
     // input : 기차 시간 조회
@@ -64,7 +64,7 @@ public class TrainController {
     @PostMapping("/time")
     public String time(@RequestBody TrainTimeVo time) {
         Pair<Enum<? extends IResult>, List<TrainTimeVo>> result = trainService.selectTime(time.getTrainNo());
-        return getJsonObject(result.getKey(),result.getValue()).toString();
+        return getJsonObject(result.getKey(), result.getValue()).toString();
     }
 
     // input : 기차 요금 조회
@@ -74,7 +74,7 @@ public class TrainController {
     public String charge(@RequestBody TrainChargeVo charge) {
         Pair<Enum<? extends IResult>, TrainChargeEntity> result = trainService.selectCharge(charge);
 
-        return getJsonObject(result.getKey(),result.getValue()).toString();
+        return getJsonObject(result.getKey(), result.getValue()).toString();
 //        JSONObject object = new JSONObject();
 ////        object = trainChargeVo.isEmpty()  ? object.put("result", "fail") : object.put("result", "success");
 //        Map<String, Object> result = new HashMap<>();
@@ -129,18 +129,18 @@ public class TrainController {
         object.put("result", pair.getValue() == 0 ? "fail" : "success");
         return object.toString();
     }
+
     //예약내역 페이지
     @ResponseBody
     @PostMapping("/reservation/detail")
-    public String reservationDetail(@RequestBody ReservationEntity entity){
+    public String reservationDetail(@RequestBody ReservationEntity entity) {
         System.out.println("reservationVo.getReservationId() = " + entity.getReservationId());
         List<ReservationVo> resultVo = trainService.reservationDetail(entity);
         JSONObject object = new JSONObject();
-        object.put("result", resultVo.size()== 0 ? "fail" : "success");
+        object.put("result", resultVo.size() == 0 ? "fail" : "success");
         object.put("data", resultVo);
         return object.toString();
     }
-
 
 
     //승차권 환불 페이지
@@ -153,6 +153,7 @@ public class TrainController {
         object.put("data", resultVo);
         return object.toString();
     }
+
     //발권 승차권 페이지
     @ResponseBody
     @PostMapping("/ticket/detail/page")
@@ -163,6 +164,7 @@ public class TrainController {
         object.put("data", resultVo);
         return object.toString();
     }
+
     //승차권 확인 페이지
     @ResponseBody
     @PostMapping("/reservation/list")
@@ -179,19 +181,21 @@ public class TrainController {
         return object.toString();
 
     }
+
     //승차권 환불
     @ResponseBody
     @PostMapping("/reservation/payment/refund")
-    public String paymentRefund(@RequestBody ReservationVo inputVo){
+    public String paymentRefund(@RequestBody ReservationVo inputVo) {
         int result = trainService.refund(inputVo);
         JSONObject object = new JSONObject();
         object.put("result", result == 0 ? "fail" : "success");
         return object.toString();
     }
+
     // 예약 취소
     @ResponseBody
     @PostMapping("/reservation/cancel")
-    public String reservationCancel(@RequestBody ReservationVo inputVo){
+    public String reservationCancel(@RequestBody ReservationVo inputVo) {
         int result = trainService.cancel(inputVo);
         JSONObject object = new JSONObject();
         object.put("result", result == 0 ? "fail" : "success");
@@ -209,6 +213,14 @@ public class TrainController {
         return object.toString();
     }
 
+    private static JSONObject getJsonObject(String result) {
+        JSONObject object = new JSONObject();
+
+        object.put("result", CommonResult.FAILURE.name().toLowerCase());
+        object.put("message", result);
+
+        return object;
+    }
 
 
     private static JSONObject getJsonObject(Enum<? extends IResult> result) {
@@ -222,7 +234,8 @@ public class TrainController {
         }
         return object;
     }
-    private static JSONObject getJsonObject(Enum<? extends IResult> result,List<?> data) {
+
+    private static JSONObject getJsonObject(Enum<? extends IResult> result, List<?> data) {
         JSONObject object = new JSONObject();
 
         if (result.equals(CommonResult.SUCCESS)) {
@@ -234,7 +247,8 @@ public class TrainController {
         }
         return object;
     }
-    private static JSONObject getJsonObject(Enum<? extends IResult> result,Object data) {
+
+    private static JSONObject getJsonObject(Enum<? extends IResult> result, Object data) {
         JSONObject object = new JSONObject();
 
         if (result.equals(CommonResult.SUCCESS)) {
@@ -247,12 +261,33 @@ public class TrainController {
         return object;
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public String nullPointException(Exception e){
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<Object> nullPointException(NoSuchElementException e) {
 
-        System.out.println((e.getStackTrace()));
 
-        return null;
+
+        String msg = "SYS_ERR: " + e.getMessage();
+        StackTraceElement[] stack = e.getStackTrace();
+        String errorMethod = "";
+        for (StackTraceElement stackTraceElement : stack) {
+            final String clsName = stackTraceElement.getClassName();
+            if(!clsName.startsWith("project.server.services")) {
+                continue;
+            }
+            errorMethod = clsName+"."+stackTraceElement.getMethodName();
+            break;
+        }
+
+
+
+        JSONObject result = getJsonObject(msg);
+//
+        result = result.put("method", errorMethod);
+//
+        return new ResponseEntity<>(
+            result.toString(),
+            HttpStatus.BAD_REQUEST
+        );
     }
 
 }
