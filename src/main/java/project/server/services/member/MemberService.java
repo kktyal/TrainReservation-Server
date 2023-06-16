@@ -2,10 +2,13 @@ package project.server.services.member;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import project.Utils;
 import project.server.entities.member.MemberAuthCodeEntity;
+import project.server.enums.CommonResult;
+import project.server.enums.DataBaseResult;
+import project.server.enums.member.*;
+import project.server.enums.interfaces.IResult;
 import project.server.lang.Pair;
 import project.server.mappers.member.IMemberMapper;
 import project.server.vos.member.MemberVo;
@@ -32,7 +35,7 @@ public class MemberService {
         return memberMapper.test();
     }
     //이메일 보내기
-    public String emailSend(MemberAuthCodeEntity memberAuthCodeEntity){
+    public Enum<? extends IResult> emailSend(MemberAuthCodeEntity memberAuthCodeEntity){
         //암호 코드 생성
         memberAuthCodeEntity.setAuthCode(Utils.createAuthCode());
 
@@ -43,7 +46,7 @@ public class MemberService {
                     memberAuthCodeEntity.getEmail(), "Test Subject", "암호는" + memberAuthCodeEntity.getAuthCode() + "입니다.");
         } catch (MessagingException e) {
             // 에러 처리
-            return "SendError";
+            return EmailSendResult.NOT_SENDING_EMAIL;
         }
 
         Date createdOn = new Date();
@@ -55,31 +58,29 @@ public class MemberService {
 
         int result = memberMapper.insertAuthCode(memberAuthCodeEntity);
 
-
-
-        return result != 0 ? "success" : "DataBaseError";
+        return result != 0 ? CommonResult.SUCCESS : DataBaseResult.DATABASE_INSERT_ERROR;
 
     }
     //이메일 인증 비교
-    public Pair<String,Integer> matchEmailCodeAndGiveId(MemberAuthCodeEntity memberAuthCodeEntity){
+    public Pair<Enum<? extends IResult>,Integer> matchEmailCodeAndGiveId(MemberAuthCodeEntity memberAuthCodeEntity){
         Optional<MemberAuthCodeEntity> selectVo = memberMapper.matchEmailCode(memberAuthCodeEntity.getEmail());
-        Pair<String, Integer> pair = new Pair("","");
+        Pair<Enum<? extends IResult>, Integer> pair = new Pair("","");
         if(selectVo.isEmpty()){
-            pair.setKey("EmailFail");
+            pair.setKey(MatchAuthCodeResult.EMAIL_NO_MATCH);
             return pair;
         }else if(selectVo.get().getExpiresOn().compareTo(new Date()) < 0){
             selectVo.get().setExpired(true);
             memberMapper.updateEmailAuth(selectVo.get());
-            pair.setKey("expired");
+            pair.setKey(MatchAuthCodeResult.AUTH_CODE_EXPIRED);
             return pair;
 
         }else if(selectVo.get().getAuthCode().equals(memberAuthCodeEntity.getAuthCode())){
             MemberVo user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail()).get();
-            pair.setKey("success");
+            pair.setKey(CommonResult.SUCCESS);
             pair.setValue(user.getId());
             return pair;
         }else{
-            pair.setKey("CodeFail");
+            pair.setKey(DataBaseResult.DATABASE_SELECT_ERROR);
             return pair;
         }
 
@@ -87,28 +88,28 @@ public class MemberService {
 
 
     //이메일 인증 비교
-    public String matchEmailCode(MemberAuthCodeEntity memberAuthCodeEntity){
+    public Enum<? extends IResult> matchAuthCode(MemberAuthCodeEntity memberAuthCodeEntity){
         Optional<MemberAuthCodeEntity> selectVo = memberMapper.matchEmailCode(memberAuthCodeEntity.getEmail());
 
         if(selectVo.isEmpty()){
-            return "EmailFail";
+            return MemberResult.EMAIL_NO_MATCH;
         }else if(selectVo.get().getExpiresOn().compareTo(new Date()) < 0){
             selectVo.get().setExpired(true);
             memberMapper.updateEmailAuth(selectVo.get());
-            return "expired";
+            return MemberResult.AUTH_CODE_EXPIRED;
 
         }else if(selectVo.get().getAuthCode().equals(memberAuthCodeEntity.getAuthCode())){
             Optional<MemberVo> user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail());
 
-            return "success";
+            return CommonResult.SUCCESS;
         }else{
-            return "CodeFail";
+            return DataBaseResult.DATABASE_SELECT_ERROR;
         }
 
     }
 
     //회원가입
-    public String register(MemberVo memberVo){
+    public Enum<? extends IResult> register(MemberVo memberVo){
 
         //회원번호 생성
         while (true) {
@@ -121,73 +122,79 @@ public class MemberService {
             //중복체크
             MemberVo vo = new MemberVo();
             vo.setId(randomNumber);
-            String result = isDuplicationId(vo);
+            Enum<? extends IResult> result = isDuplicationId(vo);
 
-            if (result.equals("Not Duplication")) {
+            if (result.equals(CommonResult.SUCCESS)) {
                 memberVo.setId(randomNumber);
                 break;
             }
         }
+        if(memberMapper.findByEmail(memberVo.getEmail()).isPresent()){
+            return IsDuplicated.EMAIL_DUPLICATED;
+        }
+        if(memberMapper.findByPhone(memberVo.getPhone()).isPresent()){
+            return IsDuplicated.PHONE_DUPLICATED;
+        }
+
         //비밀번호 암호화
         memberVo.setPw(Utils.hashSha512(memberVo.getPw()));
 
         int result = memberMapper.save(memberVo);
-        return result != 0 ? "success" : "DataBaseError";
+        return result != 0 ? CommonResult.SUCCESS : DataBaseResult.DATABASE_INSERT_ERROR;
     }
 
     //폰 중복확인
-    public String isDuplicationPhone(MemberVo memberVo){
+    public Enum<? extends IResult> isDuplicationPhone(MemberVo memberVo){
         Optional<MemberVo> selectVo = memberMapper.findByPhone(memberVo.getPhone());
         if(selectVo.isEmpty()){
-            return "Not Duplication";
+            return CommonResult.SUCCESS;
         }else {
-            return "Duplication";
+            return IsDuplicated.PHONE_DUPLICATED;
         }
 
     }
     //이메일 중복확인
-    public String isDuplicationEmail(MemberVo memberVo){
+    public Enum<? extends IResult> isDuplicationEmail(MemberVo memberVo){
         Optional<MemberVo> selectVo = memberMapper.findByEmail(memberVo.getEmail());
         if(selectVo.isEmpty()){
-            return "Not Duplication";
+            return CommonResult.SUCCESS;
         }else {
-            return "Duplication";
+            return IsDuplicated.EMAIL_DUPLICATED;
         }
 
     }
     //폰 중복확인
-    public String isDuplicationId(MemberVo memberVo){
+    public Enum<? extends IResult> isDuplicationId(MemberVo memberVo){
         Optional<MemberVo> selectVo = memberMapper.findById(memberVo.getId());
         if(selectVo.isEmpty()){
-            return "Not Duplication";
+            return CommonResult.SUCCESS;
         }else {
-            return "Duplication";
+            return IsDuplicated.ID_DUPLICATED;
         }
-
     }
 
 
     // 비번 번경 전 아이디와 이메일 유무 확인
-    public String existEmailAndId(MemberVo memberVo){
+    public Enum<? extends IResult> existEmailAndId(MemberVo memberVo){
         Optional<MemberVo> selectVo = memberMapper.findByEmailAndId(memberVo);
         if(selectVo.isEmpty()){
-            return "Not Exist";
+            return ExistEmailAndId.NO_EXIST;
         }else {
-            return "Exist";
+            return CommonResult.SUCCESS;
         }
     }
 
-    public String updatePw(MemberVo memberVo){
+    public Enum<? extends IResult> updatePw(MemberVo memberVo){
         memberVo.setPw(Utils.hashSha512(memberVo.getPw()));
         int result = memberMapper.updatePw(memberVo);
-        return result != 0 ? "success" : "DataBaseError";
+        return result != 0 ? CommonResult.SUCCESS : DataBaseResult.DATABASE_UPDATE_ERROR;
     }
 
-    public Pair<String, MemberVo> login(MemberVo memberVo){
+    public Pair<Enum<? extends IResult>, MemberVo> login(MemberVo memberVo){
         memberVo.setPw(Utils.hashSha512(memberVo.getPw()));
 
 
-        Pair<String, MemberVo> pair = new Pair<>("",null);
+        Pair<Enum<? extends IResult>, MemberVo> pair = new Pair<>(null,null);
 
         Optional<MemberVo> selectVo;
         if(memberVo.getId()!=null){
@@ -197,20 +204,21 @@ public class MemberService {
         }else if(memberVo.getEmail()!=null) {
             selectVo = memberMapper.findByEmail(memberVo.getEmail());
         }else {
-            pair.setKey("Bad Request");
+            pair.setKey(MemberResult.ID_NO_MATCH);
             return pair;
         }
         if (selectVo.isEmpty()){
-            pair.setKey("No Id");
+            pair.setKey(LoginResult.ID_NO_MATCH);
             return pair;
         }
 
 
         if (selectVo.get().getPw().equals(memberVo.getPw())) {
-            pair.setKey("success");
+            pair.setKey(CommonResult.SUCCESS);
+            selectVo.get().setPw("");
             pair.setValue(selectVo.get());
         } else {
-            pair.setKey("fail");
+            pair.setKey(LoginResult.PASSWORD_NO_MATCH);
         }
         return pair;
 

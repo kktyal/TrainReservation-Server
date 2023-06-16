@@ -8,6 +8,9 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.server.entities.train.*;
+import project.server.enums.CommonResult;
+import project.server.enums.interfaces.IResult;
+import project.server.enums.trainResult.TrainResult;
 import project.server.mappers.train.ITrainMapper;
 import project.server.vos.train.*;
 
@@ -32,7 +35,6 @@ public class TrainService {
         this.trainMapper = trainMapper;
     }
 
-
     public Optional<ReservationEntity> test() {
         LocalDate currentDate = LocalDate.now();
         UUID uuid = UUID.randomUUID();
@@ -41,31 +43,33 @@ public class TrainService {
         return trainMapper.selectReservationId("20230613");
     }
 
-    public int cancel(ReservationVo inputVo){
+    public int cancel(ReservationVo inputVo) {
         return trainMapper.updateCancelToReservation(inputVo.getReservationId());
     }
-    public int refund(ReservationVo inputVo){
+
+    public int refund(ReservationVo inputVo) {
         ReservationEntity reservation = trainMapper.selectReservationId(inputVo.getReservationId()).get();
         return trainMapper.updateRefundToPayment(reservation.getPaymentId());
     }
+
     @Transactional
-    public int payment(ReservationEntity reservationEntity){
+    public int payment(ReservationEntity reservationEntity) {
 
         PaymentEntity payment = new PaymentEntity();
 
         // 총 금액을 알기 위해 ticket에서 age, price 조회
-        int totalPrice = 0 ;
+        int totalPrice = 0;
         List<TicketEntity> ticketEntities = trainMapper.selectTicketByReservationId(reservationEntity.getReservationId());
         for (TicketEntity ticketEntity : ticketEntities) {
-            if (ticketEntity.getAge().equals("adult")){
-                totalPrice+= ticketEntity.getPrice();
-            }else if (ticketEntity.getAge().equals("old")){
-                totalPrice+= (int)ticketEntity.getPrice()*0.8;
-            }else{
-                totalPrice+= (int)ticketEntity.getPrice()*0.7;
+            if (ticketEntity.getAge().equals("adult")) {
+                totalPrice += ticketEntity.getPrice();
+            } else if (ticketEntity.getAge().equals("old")) {
+                totalPrice += (int) ticketEntity.getPrice() * 0.8;
+            } else {
+                totalPrice += (int) ticketEntity.getPrice() * 0.7;
             }
         }
-        payment.setTotalPrice((int)Math.floor(totalPrice/100) * 100);
+        payment.setTotalPrice((int) Math.floor(totalPrice / 100) * 100);
 
         // paymentid 세팅
         String paymentId;
@@ -80,13 +84,13 @@ public class TrainService {
 
         reservationEntity.setPaymentId(paymentId);
         int updateReservationPaymentIdResult = trainMapper.updateReservationPaymentId(reservationEntity);
-        if(savePaymentResult ==1 && updateReservationPaymentIdResult == 1){
+        if (savePaymentResult == 1 && updateReservationPaymentIdResult == 1) {
             return 1;
-        }
-        else return 0;
+        } else return 0;
 
 
     }
+
     public String createId() {
         LocalDate currentDate = LocalDate.now();
         UUID uuid = UUID.randomUUID();
@@ -95,8 +99,9 @@ public class TrainService {
 
         return result;
     }
+
     @Transactional
-    public Pair<String, Integer> reservation(List<ReservationVo> reservationVo, InquiryVo count) {
+    public Pair<String, Integer> reservation(List<ReservationVo> reservationVo, CntVo count) {
 
         Pair<String, Integer> pair = new Pair<>(null, null);
         //검증
@@ -133,7 +138,7 @@ public class TrainService {
 
 
         //티켓
-        TrainChargeEntity trainChargeEntity = selectCharge(charge).get();
+        TrainChargeEntity trainChargeEntity = selectCharge(charge).getValue();
 
         int adultCnt = count.getAdult();
         int oldCnt = count.getOld();
@@ -188,7 +193,8 @@ public class TrainService {
         pair.setValue(reservationCnt + ticketCnt);
         return pair;
     }
-    public List<ReservationVo>reservationRefundPage (ReservationEntity input){
+
+    public List<ReservationVo> reservationRefundPage(ReservationEntity input) {
         List<ReservationVo> resultVo = trainMapper.showReservation(input.getReservationId());
         System.out.println("inputVo.getReservationId() = " + input.getReservationId());
         for (ReservationVo vo : resultVo) {
@@ -197,7 +203,8 @@ public class TrainService {
         }
         return resultVo;
     }
-    public List<ReservationVo>reservationDetail (ReservationEntity input){
+
+    public List<ReservationVo> reservationDetail(ReservationEntity input) {
         List<ReservationVo> resultVo = trainMapper.showReservation(input.getReservationId());
         System.out.println("inputVo.getReservationId() = " + input.getReservationId());
         for (ReservationVo vo : resultVo) {
@@ -205,86 +212,116 @@ public class TrainService {
         }
         return resultVo;
     }
-    public List<ReservationVo> ticketDetail(ReservationVo inputVo){
+
+    public List<ReservationVo> ticketDetail(ReservationVo inputVo) {
         System.out.println("inputVo.getR = " + inputVo.getReservationId());
         return trainMapper.showReservation(inputVo.getReservationId());
 
     }
+
     @Transactional
-    public List<ReservationVo> selectReservationListsByMemberId(Integer memberId){
+    public List<ReservationVo> selectReservationListsByMemberId(Integer memberId) {
         disuse();
         return trainMapper.selectReservationByMemberId(memberId);
     }
-    public Optional<TrainChargeEntity> selectCharge(TrainChargeVo chargeVo) {
+
+    public Pair<Enum<? extends IResult>,TrainChargeEntity> selectCharge(TrainChargeVo chargeVo) {
+        Pair<Enum<? extends IResult>, TrainChargeEntity> pair = new Pair<>(null, null);
         chargeVo.setDepart(transferStationName(chargeVo.getDepartName()).getIndex());
         chargeVo.setArrive(transferStationName(chargeVo.getArriveName()).getIndex());
-
-        return trainMapper.selectCharge(chargeVo);
+        Optional<TrainChargeEntity> result = trainMapper.selectCharge(chargeVo);
+        if(result.isEmpty()){
+            pair.setKey(TrainResult.NO_SUCH_ELEMENT);
+        }
+        pair.setKey(CommonResult.SUCCESS);
+        pair.setValue(result.get());
+        return pair;
 
     }
-    public List<TrainTimeVo> selectTime(int srtNo) {
+
+    public Pair<Enum<? extends IResult>, List<TrainTimeVo>> selectTime(int srtNo) {
+        Pair<Enum<? extends IResult>, List<TrainTimeVo>> pair = new Pair<>(null, null);
         List<TrainTimeVo> trainTimeEntities = trainMapper.selectTime(srtNo);
-        System.out.println("trainTimeEntities.size() = " + trainTimeEntities.size());
-
-
-        return trainTimeEntities;
+        if(trainTimeEntities.size()==0){
+            pair.setKey(TrainResult.NO_SUCH_ELEMENT);
+        }
+        pair.setKey(CommonResult.SUCCESS);
+        pair.setValue(trainTimeEntities);
+        return pair;
     }
+
     @Transactional
-    public List<ReservationVo> selectSeat(ReservationVo vo){
+    public List<ReservationVo> selectSeat(ReservationVo vo) {
         disuse();
-        ApiVo apiVo =new ApiVo();
+        ApiVo apiVo = new ApiVo();
         apiVo.setTrainno(vo.getTrainNo());
         apiVo.setDate(vo.getDate());
         apiVo.setDepplandtime(vo.getDepartTime());
         apiVo.setArrplandtime(vo.getArriveTime());
         return trainMapper.findSoldSeat(apiVo);
     }
+
     public int disuse() {
         Date now = new Date();
         return trainMapper.updateDisuse(now);
     }
+
+
     @Transactional
-    public List<ApiVo> api(InquiryVo inquiryVo) throws IOException {
-        List<ApiVo> api = getApi(inquiryVo);
+    public Pair<Enum<? extends IResult>, List<ApiVo>> api(CntVo cntVo) throws IOException {
+        Pair<Enum<? extends IResult>, List<ApiVo>> pair = new Pair<>(CommonResult.SUCCESS, null);
+        List<ApiVo> api;
+        try {
+            api = getApi(cntVo);
+        } catch (Exception e) {
+            pair.setKey(TrainResult.API_ERROR);
+            return pair;
+        }
+
+        if (api.size() == 0) {
+            pair.setKey(TrainResult.NO_SUCH_ELEMENT);
+            return pair;
+        }
+
         int result = disuse();
-        System.out.println("result = " + result);
-        //todo: 매진 좌석 선택
+
         for (ApiVo apiVo : api) {
             int common = 0;
             int vip = 0;
             List<ReservationVo> soldSeat = trainMapper.findSoldSeat(apiVo);
-            System.out.println(soldSeat.size());
+
             for (ReservationVo reservationVo : soldSeat) {
                 if (reservationVo.getCarriage() != 2)
                     common++;
                 else
                     vip++;
             }
-            System.out.println("common = " + common);
-            System.out.println("vip = " + vip);
-            if (inquiryVo.getOld() + inquiryVo.getKid() + inquiryVo.getAdult() + vip >= 9) {
+            if (cntVo.getOld() + cntVo.getKid() + cntVo.getAdult() + vip >= 9) {
                 apiVo.setVip(true);
             }
-            if (inquiryVo.getOld() + inquiryVo.getKid() + inquiryVo.getAdult() + common >= 20) {
+            if (cntVo.getOld() + cntVo.getKid() + cntVo.getAdult() + common >= 20) {
                 apiVo.setCommon(true);
             }
         }
 
-        return api;
+        pair.setValue(api);
+        return pair;
     }
+
     public TrainStationEntity transferStationName(String stationName) {
         System.out.println(stationName);
         return trainMapper.findByName(stationName).get();
     }
-    public List<ApiVo> getApi(InquiryVo inquiryVo) throws IOException {
+
+    public List<ApiVo> getApi(CntVo cntVo) throws IOException {
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=ovMDJk4e%2BY2bRcCR4qJTYDuTlnmFIMOPMmZsPd1rbUJylcSo%2FUyXnFaJWPu1yt4M1ZdnTfH20zVHD91u9HQt1Q%3D%3D"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
         urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("20", "UTF-8")); /*한 페이지 결과 수*/
         urlBuilder.append("&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /*데이터 타입(xml, json)*/
-        urlBuilder.append("&" + URLEncoder.encode("depPlaceId", "UTF-8") + "=" + URLEncoder.encode(transferStationName(inquiryVo.getDepartStationName()).getStationCode(), "UTF-8")); /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
-        urlBuilder.append("&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(transferStationName(inquiryVo.getArriveStationName()).getStationCode(), "UTF-8")); /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
-        urlBuilder.append("&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(inquiryVo.getFullDate().substring(0, 8), "UTF-8")); /*출발일(YYYYMMDD)*/
+        urlBuilder.append("&" + URLEncoder.encode("depPlaceId", "UTF-8") + "=" + URLEncoder.encode(transferStationName(cntVo.getDepartStation()).getStationCode(), "UTF-8")); /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
+        urlBuilder.append("&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(transferStationName(cntVo.getArriveStation()).getStationCode(), "UTF-8")); /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
+        urlBuilder.append("&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(cntVo.getDate().substring(0, 8), "UTF-8")); /*출발일(YYYYMMDD)*/
         urlBuilder.append("&" + URLEncoder.encode("trainGradeCode", "UTF-8") + "=" + URLEncoder.encode("17", "UTF-8")); /*차량종류코드*/
         URL url = new URL(urlBuilder.toString());
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

@@ -6,6 +6,6 @@ import lombok.Data;
 public class TrainChargeEntity {
     private int depart;
     private int arrive;
-    private int charge;
-    private int chargeVip;
+    private Integer charge;
+    private Integer chargeVip;
 }
