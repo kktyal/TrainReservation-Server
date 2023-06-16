@@ -3,6 +3,7 @@ package project.server.services.train;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
+import org.apache.ibatis.jdbc.Null;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -275,7 +276,8 @@ public class TrainService {
             api = getApi(cntVo);
         } catch (Exception e) {
             pair.setKey(TrainResult.API_ERROR);
-            return pair;
+            throw new NullPointerException();
+//            return pair;
         }
 
         if (api.size() == 0) {
@@ -321,7 +323,7 @@ public class TrainService {
         urlBuilder.append("&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /*데이터 타입(xml, json)*/
         urlBuilder.append("&" + URLEncoder.encode("depPlaceId", "UTF-8") + "=" + URLEncoder.encode(transferStationName(cntVo.getDepartStation()).getStationCode(), "UTF-8")); /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
         urlBuilder.append("&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(transferStationName(cntVo.getArriveStation()).getStationCode(), "UTF-8")); /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
-        urlBuilder.append("&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(cntVo.getDate().substring(0, 8), "UTF-8")); /*출발일(YYYYMMDD)*/
+        urlBuilder.append("&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(cntVo.getDate(), "UTF-8")); /*출발일(YYYYMMDD)*/
         urlBuilder.append("&" + URLEncoder.encode("trainGradeCode", "UTF-8") + "=" + URLEncoder.encode("17", "UTF-8")); /*차량종류코드*/
         URL url = new URL(urlBuilder.toString());
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

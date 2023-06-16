@@ -4,10 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import project.server.SessionConst;
 import project.server.entities.member.MemberAuthCodeEntity;
 import project.server.enums.CommonResult;
@@ -204,6 +201,17 @@ public class MemberController {
             object.put("result", CommonResult.FAILURE.name().toLowerCase());
             object.put("message", result.name().toLowerCase());
         }
+
+//        object.put("result", result.name().toLowerCase());
+//        object.put("message", result.equals(CommonResult.SUCCESS)? result.message() : null);
         return object;
+    }
+
+    @ExceptionHandler
+    public String nullPointException(Exception e){
+
+        e.getStackTrace();
+
+        return null;
     }
 }

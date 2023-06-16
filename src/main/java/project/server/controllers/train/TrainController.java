@@ -3,10 +3,7 @@ package project.server.controllers.train;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import project.server.SessionConst;
 import project.server.entities.train.ReservationEntity;
 import project.server.entities.train.TrainChargeEntity;
@@ -249,4 +246,13 @@ public class TrainController {
         }
         return object;
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public String nullPointException(Exception e){
+
+        System.out.println((e.getStackTrace()));
+
+        return null;
+    }
+
 }

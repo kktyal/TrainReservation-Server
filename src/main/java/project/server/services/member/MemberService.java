@@ -3,6 +3,7 @@ package project.server.services.member;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import project.Utils;
 import project.server.entities.member.MemberAuthCodeEntity;
 import project.server.enums.CommonResult;
@@ -223,5 +224,6 @@ public class MemberService {
         return pair;
 
     }
+
 
 }

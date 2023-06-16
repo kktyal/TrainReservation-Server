@@ -10,13 +10,11 @@
     </select>
 
 
-
     <select id="selectTicketByReservationId" resultType="TicketEntity">
         select *
         from `good`.`ticket`
         where `reservation_id` = #{reservationId}
     </select>
-
 
 
     <select id="findByName" resultType="TrainStationEntity">
@@ -25,23 +23,36 @@
         where `station_name` = #{name}
     </select>
 
-
-    <update id="updateDisuse"><![CDATA[
+    <update id="updateDisuse">
+    <![CDATA[
         update `good`.`reservation`
         set `disuse` = 1
-        where `reservation_id` not in (
-            select `r`.`reservation_id`
-            from `good`.`reservation` as `r`
-                left join `good`.`payment` as `p` on `p`.`payment_id` = `r`.`payment_id`
-            where (`r`.`payment_id` is not null and `p`.`refund` = 0)
-               or (`r`.`payment_id` is null and `expired_date` > #{nowDate})
-            )
-        ]]></update>
+        where `reservation_id` not in (select `sub`.`reservation_id`
+                                       from (select `r`.`reservation_id`
+                                             from `good`.`reservation` as `r`
+                                                      left join `good`.`payment` as `p` on `p`.`payment_id` = `r`.`payment_id`
+                                             where (`r`.`payment_id` is not null and `p`.`refund` = 0)
+                                                or (`r`.`payment_id` is null and `expired_date` > #{nowDate})) as `sub`)
+        ]]>
+    </update>
+
+
+    <!--    <update id="updateDisuse"><![CDATA[-->
+    <!--        update `good`.`reservation`-->
+    <!--        set `disuse` = 1-->
+    <!--        where `reservation_id` not in (-->
+    <!--            select `r`.`reservation_id`-->
+    <!--            from `good`.`reservation` as `r`-->
+    <!--                left join `good`.`payment` as `p` on `p`.`payment_id` = `r`.`payment_id`-->
+    <!--            where (`r`.`payment_id` is not null and `p`.`refund` = 0)-->
+    <!--               or (`r`.`payment_id` is null and `expired_date` > #{nowDate})-->
+    <!--            )-->
+    <!--        ]]></update>-->
 
     <update id="updateReservationPaymentId">
         update `good`.`reservation`
         set `payment_id` = #{paymentId}
-        where `reservation_id` =#{reservationId}
+        where `reservation_id` = #{reservationId}
     </update>
 
     <update id="updateRefundToPayment">
@@ -93,7 +104,7 @@
                 and depart = #{depart} and arrive = #{arrive}
             </if>
             <if test="depart  &gt; arrive">
-                 and depart = #{arrive} and arrive = #{depart}
+                and depart = #{arrive} and arrive = #{depart}
             </if>
         </where>
     </select>
@@ -123,11 +134,11 @@
     </insert>
     <insert id="saveTicket">
         insert into `good`.`ticket`
-        values (#{ticketId}, #{trainNo}, #{carriage}, #{seat}, #{reservationId},#{age},#{price})
+        values (#{ticketId}, #{trainNo}, #{carriage}, #{seat}, #{reservationId}, #{age}, #{price})
     </insert>
     <insert id="savePayment">
-        insert into `good`.`payment`(`payment_id`,`total_price`)
-        values (#{paymentId},#{totalPrice})
+        insert into `good`.`payment`(`payment_id`, `total_price`)
+        values (#{paymentId}, #{totalPrice})
     </insert>
 
     <select id="duplicatedTicket" resultType="ReservationVo"><![CDATA[
@@ -170,7 +181,7 @@
                `r`.`depart_station`,
                `r`.`depart_time`,
                `r`.`expired_date`,
-               count(`t`.`seat`) as ticketCnt,
+               count(`t`.`seat`) as `ticketCnt`,
                `t`.`train_no`
         from `good`.`reservation` as `r`
                  left join `good`.`ticket` as `t` on `r`.`reservation_id` = `t`.`reservation_id`
