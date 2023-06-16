@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import project.Validator;
 import project.server.SessionConst;
 import project.server.entities.member.MemberAuthCodeEntity;
 import project.server.enums.CommonResult;
@@ -176,7 +177,7 @@ public class MemberController {
         if (!isValidInteger(memberVo.getId()) && !isValidString(memberVo.getPhone()) && !isValidString(memberVo.getEmail())) {
             return getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
-        if(!isValidString(memberVo.getPw())){
+        if (!isValidString(memberVo.getPw())) {
             return getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -189,7 +190,6 @@ public class MemberController {
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
         return getJsonObject(result.getKey()).toString();
     }
-
 
 
     private static JSONObject getJsonObject(Enum<? extends IResult> result) {
@@ -207,8 +207,25 @@ public class MemberController {
         return object;
     }
 
+    @ResponseBody
+    @PostMapping("/authorized")
+    public String testSession(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        Object temp = session.getAttribute(SessionConst.LOGIN_MEMBER);
+        if (temp == null) {
+            return getJsonObject(CommonResult.FAILURE).toString();
+        }
+        if (temp instanceof MemberVo) {
+            return getJsonObject(CommonResult.FAILURE).toString();
+        }
+
+        return Validator.isValid((MemberVo) temp, "id")
+                ? getJsonObject(CommonResult.SUCCESS).toString()
+                : getJsonObject(CommonResult.FAILURE).toString();
+    }
+
     @ExceptionHandler
-    public String nullPointException(Exception e){
+    public String nullPointException(Exception e) {
 
         e.getStackTrace();
 
