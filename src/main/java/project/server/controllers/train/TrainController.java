@@ -265,7 +265,7 @@ public class TrainController {
     public ResponseEntity<Object> nullPointException(NoSuchElementException e) {
 
 
-
+        e.printStackTrace();
         String msg = "SYS_ERR: " + e.getMessage();
         StackTraceElement[] stack = e.getStackTrace();
         String errorMethod = "";
