@@ -92,11 +92,11 @@ public class MemberService {
         Optional<MemberAuthCodeEntity> selectVo = memberMapper.matchEmailCode(memberAuthCodeEntity.getEmail());
 
         if(selectVo.isEmpty()){
-            return MemberResult.EMAIL_NO_MATCH;
+            return MatchAuthCodeResult.EMAIL_NO_MATCH;
         }else if(selectVo.get().getExpiresOn().compareTo(new Date()) < 0){
             selectVo.get().setExpired(true);
             memberMapper.updateEmailAuth(selectVo.get());
-            return MemberResult.AUTH_CODE_EXPIRED;
+            return MatchAuthCodeResult.AUTH_CODE_EXPIRED;
 
         }else if(selectVo.get().getAuthCode().equals(memberAuthCodeEntity.getAuthCode())){
             Optional<MemberVo> user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail());
@@ -204,7 +204,7 @@ public class MemberService {
         }else if(memberVo.getEmail()!=null) {
             selectVo = memberMapper.findByEmail(memberVo.getEmail());
         }else {
-            pair.setKey(MemberResult.ID_NO_MATCH);
+            pair.setKey(LoginResult.ID_NO_MATCH);
             return pair;
         }
         if (selectVo.isEmpty()){
