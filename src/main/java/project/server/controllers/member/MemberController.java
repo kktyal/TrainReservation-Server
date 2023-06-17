@@ -5,13 +5,12 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import project.Validator;
+import project.Utils;
 import project.server.SessionConst;
+import project.server.controllers.MyController;
 import project.server.entities.member.MemberAuthCodeEntity;
-import project.server.entities.member.MemberEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
-import project.server.enums.member.SessionAuthorizedResult;
 import project.server.lang.Pair;
 import project.server.services.member.MemberService;
 import project.server.vos.member.MemberVo;
@@ -25,7 +24,7 @@ import static project.Validator.isValidString;
 @Slf4j
 @Controller
 @RequestMapping("/member")
-public class MemberController {
+public class MemberController extends MyController {
 
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
     @Autowired
@@ -42,11 +41,12 @@ public class MemberController {
     @PostMapping("emailSend")
     public String emailSend(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
 
+
         if (!isValidString(memberAuthCodeEntity.getEmail())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
         Enum<? extends IResult> result = memberService.emailSend(memberAuthCodeEntity);
-        return getJsonObject(result).toString();
+        return Utils.getJsonObject(result).toString();
     }
 
 
@@ -61,11 +61,11 @@ public class MemberController {
 //            return getJsonObject(CommonResult.INPUT_ERROR).toString();
 //        }
         if (!isValidString(memberVo.getEmail()) || !isValidInteger(memberVo.getId())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Enum<? extends IResult> result = memberService.existEmailAndId(memberVo);
-        return getJsonObject(result).toString();
+        return Utils.getJsonObject(result).toString();
     }
 
 
@@ -74,12 +74,12 @@ public class MemberController {
     @PostMapping("/register/matchEmailCode")
     public String emailCheckByRegister(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
         if (!isValidString(memberAuthCodeEntity.getEmail()) || !isValidString(memberAuthCodeEntity.getAuthCode())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
 
         Enum<? extends IResult> result = memberService.matchAuthCode(memberAuthCodeEntity);
-        return getJsonObject(result).toString();
+        return Utils.getJsonObject(result).toString();
     }
 
     //아이디 찾기 이메일 인증 코드 확인
@@ -88,11 +88,11 @@ public class MemberController {
     public String emailCheckByFindId(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
 
         if (!isValidString(memberAuthCodeEntity.getEmail()) || !isValidString(memberAuthCodeEntity.getAuthCode())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Pair<Enum<? extends IResult>, Integer> pair = memberService.matchEmailCodeAndGiveId(memberAuthCodeEntity);
-        JSONObject object = getJsonObject(pair.getKey());
+        JSONObject object = Utils.getJsonObject(pair.getKey());
 
         if (pair.getValue() != null) {
             object.put("data", pair.getValue());
@@ -106,11 +106,11 @@ public class MemberController {
     public String emailCheckByUpdatePw(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
 
         if (!isValidString(memberAuthCodeEntity.getEmail()) || !isValidString(memberAuthCodeEntity.getAuthCode())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Enum<? extends IResult> result = memberService.matchAuthCode(memberAuthCodeEntity);
-        return getJsonObject(result).toString();
+        return Utils.getJsonObject(result).toString();
     }
 
 
@@ -122,11 +122,11 @@ public class MemberController {
         if (!isValidString(memberVo.getEmail()) || !isValidString(memberVo.getPhone())
                 || !isValidString(memberVo.getPw()) || !isValidString(memberVo.getName())
                 || !isValidString(memberVo.getGender()) || !isValidString(memberVo.getBirth())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Enum<? extends IResult> result = memberService.register(memberVo);
-        return getJsonObject(result).toString();
+        return Utils.getJsonObject(result).toString();
     }
 
     @ResponseBody
@@ -134,13 +134,13 @@ public class MemberController {
     public String isDuplicationPhone(@RequestBody MemberVo memberVo) {
 
         if (!isValidString(memberVo.getPhone())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
         // 중복 확인
         Enum<? extends IResult> result = memberService.isDuplicationPhone(memberVo);
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
 
-        return getJsonObject(result).toString();
+        return Utils.getJsonObject(result).toString();
     }
 
     @ResponseBody
@@ -148,13 +148,13 @@ public class MemberController {
     public String isDuplicationEmail(@RequestBody MemberVo memberVo) {
 
         if (!isValidString(memberVo.getEmail())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         // 중복 확인
         Enum<? extends IResult> result = memberService.isDuplicationEmail(memberVo);
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
-        return getJsonObject(result).toString();
+        return Utils.getJsonObject(result).toString();
     }
 
     //비번 변경
@@ -163,12 +163,12 @@ public class MemberController {
     public String updatePw(@RequestBody MemberVo memberVo) {
 
         if (!isValidInteger(memberVo.getId()) || !isValidString(memberVo.getPhone())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Enum<? extends IResult> result = memberService.updatePw(memberVo);
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
-        return getJsonObject(result).toString();
+        return Utils.getJsonObject(result).toString();
     }
 
     //로그인
@@ -177,10 +177,10 @@ public class MemberController {
     public String login(@RequestBody MemberVo memberVo, HttpServletRequest request) {
 
         if (!isValidInteger(memberVo.getId()) && !isValidString(memberVo.getPhone()) && !isValidString(memberVo.getEmail())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
         if (!isValidString(memberVo.getPw())) {
-            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Pair<Enum<? extends IResult>, MemberVo> result = memberService.login(memberVo);
@@ -190,55 +190,13 @@ public class MemberController {
         }
 
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
-        return getJsonObject(result.getKey()).toString();
-    }
-
-    @ResponseBody
-    @PostMapping("/authorized")
-    public String testSession(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-
-        if(session == null){
-            return getJsonObject(SessionAuthorizedResult.NO_SESSION).toString();
-        }
-
-        Object temp = null;
-        try {
-            temp = session.getAttribute(SessionConst.LOGIN_MEMBER);
-        } catch (IllegalStateException e) {
-            return getJsonObject(SessionAuthorizedResult.SESSION_EXPIRED).toString();
-        }
-        if (temp == null) {
-            return getJsonObject(SessionAuthorizedResult.SESSION_EXPIRED).toString();
-        }
-        if (!(temp instanceof MemberEntity)) {
-            return getJsonObject(SessionAuthorizedResult.SESSION_EXPIRED).toString();
-        }
-
-        return Validator.isValid((MemberVo) temp, "id")
-                ? getJsonObject(CommonResult.SUCCESS).toString()
-                : getJsonObject(SessionAuthorizedResult.SESSION_EXPIRED).toString();
-    }
-
-    private static JSONObject getJsonObject(Enum<? extends IResult> result) {
-        JSONObject object = new JSONObject();
-
-        if (result.equals(CommonResult.SUCCESS)) {
-            object.put("result", result.name().toLowerCase());
-        } else {
-            object.put("result", CommonResult.FAILURE.name().toLowerCase());
-            object.put("message", result.name().toLowerCase());
-        }
-
-        return object;
+        return Utils.getJsonObject(result.getKey()).toString();
     }
 
 
-    @ExceptionHandler
-    public String nullPointException(Exception e) {
 
-        e.getStackTrace();
 
-        return null;
-    }
+
+
+
 }

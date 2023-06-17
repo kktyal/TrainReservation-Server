@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class TrainStationEntity {
-    private int index;
+    private Integer index;
     private String stationName;
     private String stationCode;
 }

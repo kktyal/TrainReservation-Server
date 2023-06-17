@@ -5,8 +5,12 @@ import project.server.entities.train.ReservationEntity;
 
 @Data
 public class CntVo extends ReservationEntity {
-    private int adult;
-    private int kid;
-    private int old;
+    private Integer adult;
+    private Integer kid;
+    private Integer old;
+
+    public Integer sum(){
+        return adult+kid+old;
+    }
 }
 

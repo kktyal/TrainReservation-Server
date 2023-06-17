@@ -62,7 +62,7 @@ public class MemberService {
         return result != 0 ? CommonResult.SUCCESS : DataBaseResult.DATABASE_INSERT_ERROR;
 
     }
-    //이메일 인증 비교
+    //이메일 인증 비교 후 아이디 주기
     public Pair<Enum<? extends IResult>,Integer> matchEmailCodeAndGiveId(MemberAuthCodeEntity memberAuthCodeEntity){
         Optional<MemberAuthCodeEntity> selectVo = memberMapper.matchEmailCode(memberAuthCodeEntity.getEmail());
         Pair<Enum<? extends IResult>, Integer> pair = new Pair("","");

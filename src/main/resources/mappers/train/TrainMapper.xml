@@ -53,6 +53,7 @@
         update `good`.`reservation`
         set `payment_id` = #{paymentId}
         where `reservation_id` = #{reservationId}
+          and `payment_id` is null
     </update>
 
     <update id="updateRefundToPayment">
@@ -63,7 +64,7 @@
     <update id="updateCancelToReservation">
         update `good`.`reservation`
         set `disuse` = 1
-        where `reservation_id` = #{reservationId}
+        where `reservation_id` = #{reservationId} and `disuse`= 0
     </update>
 
 

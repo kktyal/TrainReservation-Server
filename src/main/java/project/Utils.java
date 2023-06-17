@@ -1,15 +1,85 @@
 package project;
 
+import org.json.JSONObject;
+import project.server.enums.CommonResult;
+import project.server.enums.interfaces.IResult;
+import project.server.enums.trainResult.TrainResult;
+import project.server.lang.Pair;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 
 public class Utils {
+    public static Pair<Enum<? extends IResult>, List<?>> getListPair(List<?> result) {
+        Pair<Enum<? extends IResult>, List<?>> pair = new Pair<>(null, null);
+        if (result.size() == 0) {
+            pair.setKey(TrainResult.NO_SEARCH_DATA);
+        } else {
+            pair.setKey(CommonResult.SUCCESS);
+            pair.setValue(result);
+        }
+        return pair;
+    }
+    public static Pair<Enum<? extends IResult>, Integer> getIngegerPair(Integer result) {
+        Pair<Enum<? extends IResult>, Integer> pair = new Pair<>(null, null);
+        System.out.println("++");
+        System.out.println("result = " + result);
+        System.out.println("++");
+        if (result == 0) {
+            pair.setKey(TrainResult.NO_SEARCH_DATA);
+        } else {
+            pair.setKey(CommonResult.SUCCESS);
+            pair.setValue(result);
+        }
+        return pair;
+    }
+    public static JSONObject getJsonObject(Enum<? extends IResult> result) {
+        JSONObject object = new JSONObject();
+
+        if (result.equals(CommonResult.SUCCESS)) {
+            object.put("result", result.name().toLowerCase());
+        } else {
+            object.put("result", CommonResult.FAILURE.name().toLowerCase());
+            object.put("message", result.name().toLowerCase());
+        }
+        return object;
+    }
+
+
+
+    public static JSONObject getJsonObject(Enum<? extends IResult> result, List<?> data) {
+        JSONObject object = new JSONObject();
+
+        if (result.equals(CommonResult.SUCCESS)) {
+            object.put("result", result.name().toLowerCase());
+            object.put("data", data);
+        } else {
+            object.put("result", CommonResult.FAILURE.name().toLowerCase());
+            object.put("message", result.name().toLowerCase());
+        }
+        return object;
+    }
+
+
+    public static Map<String, Object> getJsonObject(Enum<? extends IResult> result, Object data) {
+
+        Map<String, Object> jsonData = new HashMap<>();
+        if (result.equals(CommonResult.SUCCESS)) {
+            jsonData.put("result", result.name().toLowerCase());
+            jsonData.put("data", data);
+        } else {
+            jsonData.put("result", CommonResult.FAILURE.name().toLowerCase());
+            jsonData.put("message", result.name().toLowerCase());
+        }
+        return jsonData;
+    }
+
+
 
     public static String md5(String s) {
         String MD5 = "MD5";

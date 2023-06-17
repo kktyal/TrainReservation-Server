@@ -1,9 +1,11 @@
 package project.server.entities.train;
 
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 
 @Data
 public class TicketEntity {
+
     private String ticketId;
     private int trainNo;
     private int carriage;
