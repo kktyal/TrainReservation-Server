@@ -13,6 +13,7 @@ import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
 import project.server.lang.Pair;
 import project.server.services.member.MemberService;
+import project.server.validator.member.MemberValidator;
 import project.server.vos.member.MemberVo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,9 @@ public class MemberController extends MyController {
     @ResponseBody
     @PostMapping("emailSend")
     public String emailSend(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
-
+        if (!MemberValidator.EMAIL.matches(memberAuthCodeEntity.getEmail())) {
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+        }
 
         if (!isValidString(memberAuthCodeEntity.getEmail())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
@@ -54,13 +57,18 @@ public class MemberController extends MyController {
     @ResponseBody
     @PostMapping("updatePw/exist")
     public String selectEmailAndId(@RequestBody MemberVo memberVo) {
-//        if(!Validator.isValid(memberVo, "id")) {
-//            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+////        if(!Validator.isValid(memberVo, "id")) {
+////            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+////        }
+////        if(!Validator.isValid(memberVo, "email")) {
+////            return getJsonObject(CommonResult.INPUT_ERROR).toString();
+////        }
+//        if (!isValidString(memberVo.getEmail()) || !isValidInteger(memberVo.getId())) {
+//            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
 //        }
-//        if(!Validator.isValid(memberVo, "email")) {
-//            return getJsonObject(CommonResult.INPUT_ERROR).toString();
-//        }
-        if (!isValidString(memberVo.getEmail()) || !isValidInteger(memberVo.getId())) {
+
+        if (!MemberValidator.EMAIL.matches(memberVo.getEmail()) ||
+                !MemberValidator.ID.matches(memberVo.getId().toString())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -73,7 +81,8 @@ public class MemberController extends MyController {
     @ResponseBody
     @PostMapping("/register/matchEmailCode")
     public String emailCheckByRegister(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
-        if (!isValidString(memberAuthCodeEntity.getEmail()) || !isValidString(memberAuthCodeEntity.getAuthCode())) {
+        if (!MemberValidator.EMAIL.matches(memberAuthCodeEntity.getEmail()) ||
+                !MemberValidator.AUTH.matches(memberAuthCodeEntity.getAuthCode())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -87,7 +96,8 @@ public class MemberController extends MyController {
     @PostMapping("/findId/matchEmailCode")
     public String emailCheckByFindId(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
 
-        if (!isValidString(memberAuthCodeEntity.getEmail()) || !isValidString(memberAuthCodeEntity.getAuthCode())) {
+        if (!MemberValidator.EMAIL.matches(memberAuthCodeEntity.getEmail()) ||
+                !MemberValidator.AUTH.matches(memberAuthCodeEntity.getAuthCode())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -105,7 +115,8 @@ public class MemberController extends MyController {
     @PostMapping("/updatePw/matchEmailCode")
     public String emailCheckByUpdatePw(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
 
-        if (!isValidString(memberAuthCodeEntity.getEmail()) || !isValidString(memberAuthCodeEntity.getAuthCode())) {
+        if (!MemberValidator.EMAIL.matches(memberAuthCodeEntity.getEmail()) ||
+                !MemberValidator.AUTH.matches(memberAuthCodeEntity.getAuthCode())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -119,9 +130,9 @@ public class MemberController extends MyController {
     @PostMapping("/register")
     public String register(@RequestBody MemberVo memberVo) {
 
-        if (!isValidString(memberVo.getEmail()) || !isValidString(memberVo.getPhone())
-                || !isValidString(memberVo.getPw()) || !isValidString(memberVo.getName())
-                || !isValidString(memberVo.getGender()) || !isValidString(memberVo.getBirth())) {
+        if (!MemberValidator.EMAIL.matches(memberVo.getEmail()) || !MemberValidator.PHONE.matches(memberVo.getPhone())
+                || !MemberValidator.NAME.matches(memberVo.getName()) || !MemberValidator.GENDER.matches(memberVo.getGender())
+                || !MemberValidator.BIRTH.matches(memberVo.getBirth())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -133,8 +144,10 @@ public class MemberController extends MyController {
     @PostMapping("/isDuplication/phone")
     public String isDuplicationPhone(@RequestBody MemberVo memberVo) {
 
-        if (!isValidString(memberVo.getPhone())) {
+        if (!MemberValidator.PHONE.matches(memberVo.getPhone())) {
+            System.out.println("memberVo.getPhone() = " + memberVo.getPhone());
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+
         }
         // 중복 확인
         Enum<? extends IResult> result = memberService.isDuplicationPhone(memberVo);
@@ -147,7 +160,7 @@ public class MemberController extends MyController {
     @PostMapping("/isDuplication/email")
     public String isDuplicationEmail(@RequestBody MemberVo memberVo) {
 
-        if (!isValidString(memberVo.getEmail())) {
+        if (!MemberValidator.EMAIL.matches(memberVo.getEmail())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -162,7 +175,7 @@ public class MemberController extends MyController {
     @PostMapping("/updatePw/applyNewPw")
     public String updatePw(@RequestBody MemberVo memberVo) {
 
-        if (!isValidInteger(memberVo.getId()) || !isValidString(memberVo.getPhone())) {
+        if (!MemberValidator.ID.matches(memberVo.getId().toString())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -176,12 +189,20 @@ public class MemberController extends MyController {
     @PostMapping("/login")
     public String login(@RequestBody MemberVo memberVo, HttpServletRequest request) {
 
-        if (!isValidInteger(memberVo.getId()) && !isValidString(memberVo.getPhone()) && !isValidString(memberVo.getEmail())) {
-            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+        if (memberVo.getId() != null) {
+            if (!MemberValidator.ID.matches(memberVo.getId().toString())) {
+                return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+            }
+        }else if(memberVo.getPhone()!= null){
+            if ( !MemberValidator.PHONE.matches(memberVo.getPhone())) {
+                return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+            }
+        }else if (memberVo.getEmail()!=null){
+            if ( !MemberValidator.EMAIL.matches(memberVo.getEmail())){
+                return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+            }
         }
-        if (!isValidString(memberVo.getPw())) {
-            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
-        }
+
 
         Pair<Enum<? extends IResult>, MemberVo> result = memberService.login(memberVo);
         if (result.getKey().equals(CommonResult.SUCCESS)) {
@@ -192,11 +213,6 @@ public class MemberController extends MyController {
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
         return Utils.getJsonObject(result.getKey()).toString();
     }
-
-
-
-
-
 
 
 }

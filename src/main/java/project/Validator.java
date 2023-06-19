@@ -17,7 +17,6 @@ public class Validator {
         }
         return Boolean.TRUE.equals(isValid(obj, cls, names));
     }
-
     public static <T> Boolean isValid(T obj, Class<?> cls, String[] names) {
         for(String name : names) {
             Field f = null;
@@ -65,10 +64,10 @@ public class Validator {
 
 
 
+
     public static boolean isValidInteger(@Nullable Integer integer) {
         return isValidInteger(integer, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
-
     public static boolean isValidInteger(@Nullable Integer integer, @Nullable Integer min, @Nullable Integer max) {
         if (integer == null) {
             return false;
@@ -77,7 +76,6 @@ public class Validator {
         max = max != null ? max : Integer.MAX_VALUE;
         return integer > min && integer < max;
     }
-
     public static boolean isValidString(@Nullable String string) {
         return string != null && string.length() != 0;
     }

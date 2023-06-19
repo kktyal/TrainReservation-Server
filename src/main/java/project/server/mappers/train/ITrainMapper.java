@@ -1,6 +1,7 @@
 package project.server.mappers.train;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import project.server.entities.train.*;
 import project.server.vos.train.*;
 
@@ -23,6 +24,11 @@ public interface ITrainMapper {
     List<ReservationVo> showReservation(String reservationId);
     List<ReservationVo> selectReservationByMemberId (Integer memberId);
     List<TicketEntity> selectTicketByReservationId(String reservationId);
+
+    @Select("select `station_name` from `good`.`train_station`")
+    List<String> selectTrainStations();
+    @Select("select `train_no` from `good`.`train_no`")
+    List<Integer> selectTrainNos();
 
     int saveReservation(ReservationEntity reservation);
     int saveTicket(TicketEntity ticket);

@@ -28,7 +28,7 @@ public class MyController {
         HttpSession session = request.getSession(false);
 
         if(session == null){
-            System.out.println("0");
+         
             return Utils.getJsonObject(SessionAuthorizedResult.NO_SESSION).toString();
         }
 
@@ -36,18 +36,18 @@ public class MyController {
         try {
             temp = session.getAttribute(SessionConst.LOGIN_MEMBER);
         } catch (IllegalStateException e) {
-            System.out.println("1");
+
             return Utils.getJsonObject(SessionAuthorizedResult.MEMBER_SESSION_EXPIRED).toString();
         }
         if (temp == null) {
-            System.out.println("2");
+
             return Utils.getJsonObject(SessionAuthorizedResult.MEMBER_NO_SESSION).toString();
         }
         if (!(temp instanceof MemberEntity)) {
-            System.out.println("3");
+
             return Utils.getJsonObject(SessionAuthorizedResult.MEMBER_SESSION_EXPIRED).toString();
         }
-        System.out.println("4");
+
         return Validator.isValidString("id")
                 ? Utils.getJsonObject(CommonResult.SUCCESS).toString()
                 : Utils.getJsonObject(SessionAuthorizedResult.MEMBER_SESSION_EXPIRED).toString();
@@ -59,7 +59,7 @@ public class MyController {
         HttpSession session = request.getSession(false);
 
         if(session == null){
-            System.out.println("0");
+
             return Utils.getJsonObject(SessionAuthorizedResult.NO_SESSION).toString();
         }
 
@@ -67,18 +67,18 @@ public class MyController {
         try {
             temp = session.getAttribute(SessionConst.CNT);
         } catch (IllegalStateException e) {
-            System.out.println("1");
+
             return Utils.getJsonObject(SessionAuthorizedResult.CNT_SESSION_EXPIRED).toString();
         }
         if (temp == null) {
-            System.out.println("2");
+
             return Utils.getJsonObject(SessionAuthorizedResult.CNT_NO_SEESION).toString();
         }
         if (!(temp instanceof CntVo)) {
-            System.out.println("3");
+
             return Utils.getJsonObject(SessionAuthorizedResult.CNT_SESSION_EXPIRED).toString();
         }
-        System.out.println("4");
+
         System.out.println(((CntVo) temp).sum());
         return ((CntVo) temp).sum()!=0
                 ? Utils.getJsonObject(CommonResult.SUCCESS).toString()

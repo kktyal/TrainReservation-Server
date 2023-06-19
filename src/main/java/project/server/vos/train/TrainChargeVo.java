@@ -5,6 +5,6 @@ import project.server.entities.train.TrainChargeEntity;
 
 @Data
 public class TrainChargeVo extends TrainChargeEntity {
-    private String departName;
-    private String arriveName;
+    private String departStation;
+    private String arriveStation;
 }

@@ -143,8 +143,8 @@ public class TrainService {
 
 
         TrainChargeVo charge = new TrainChargeVo();
-        charge.setArriveName(vo.getArriveStation());
-        charge.setDepartName(vo.getDepartStation());
+        charge.setArriveStation(vo.getArriveStation());
+        charge.setDepartStation(vo.getDepartStation());
 
 
         //티켓
@@ -241,9 +241,9 @@ public class TrainService {
 
 
     public Pair<Enum<? extends IResult>, TrainChargeEntity> selectCharge(TrainChargeVo chargeVo) {
-        Integer departStationIndex = transferStationName(chargeVo.getDepartName()).getIndex();
+        Integer departStationIndex = transferStationName(chargeVo.getDepartStation()).getIndex();
         departStationIndex = departStationIndex != null ? departStationIndex : 0;
-        Integer arriveStationIndex = transferStationName(chargeVo.getArriveName()).getIndex();
+        Integer arriveStationIndex = transferStationName(chargeVo.getArriveStation()).getIndex();
         arriveStationIndex = arriveStationIndex != null ? arriveStationIndex : 0;
 
 
@@ -429,5 +429,12 @@ public class TrainService {
     public void disuse() {
         Date now = new Date();
         trainMapper.updateDisuse(now);
+    }
+
+    public List<String> getAllTranStations() {
+        return this.trainMapper.selectTrainStations();
+    }
+    public List<Integer> getAllTrainNos(){
+        return this.trainMapper.selectTrainNos();
     }
 }

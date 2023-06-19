@@ -76,10 +76,16 @@ public class MemberService {
             return pair;
 
         }else if(selectVo.get().getAuthCode().equals(memberAuthCodeEntity.getAuthCode())){
-            MemberVo user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail()).get();
-            pair.setKey(CommonResult.SUCCESS);
-            pair.setValue(user.getId());
-            return pair;
+            Optional<MemberVo> user = memberMapper.findByEmail(memberAuthCodeEntity.getEmail());
+            if (user.isEmpty()){
+                pair.setKey(ExistEmailAndId.NO_REGISTER);
+                return pair;
+            }else{
+                pair.setKey(CommonResult.SUCCESS);
+                pair.setValue(user.get().getId());
+                return pair;
+            }
+
         }else{
             pair.setKey(DataBaseResult.DATABASE_SELECT_ERROR);
             return pair;
@@ -136,6 +142,10 @@ public class MemberService {
         if(memberMapper.findByPhone(memberVo.getPhone()).isPresent()){
             return IsDuplicated.PHONE_DUPLICATED;
         }
+
+        //qwe123
+        //123qwe >> qwe123
+        //Utils.hashSha512(qwe123)
 
         //비밀번호 암호화
         memberVo.setPw(Utils.hashSha512(memberVo.getPw()));
