@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import project.Utils;
-import project.Validator;
+
 import project.server.SessionConst;
 import project.server.entities.member.MemberEntity;
 import project.server.enums.CommonResult;
@@ -28,7 +28,7 @@ public class MyController {
         HttpSession session = request.getSession(false);
 
         if(session == null){
-         
+
             return Utils.getJsonObject(SessionAuthorizedResult.NO_SESSION).toString();
         }
 
@@ -48,9 +48,8 @@ public class MyController {
             return Utils.getJsonObject(SessionAuthorizedResult.MEMBER_SESSION_EXPIRED).toString();
         }
 
-        return Validator.isValidString("id")
-                ? Utils.getJsonObject(CommonResult.SUCCESS).toString()
-                : Utils.getJsonObject(SessionAuthorizedResult.MEMBER_SESSION_EXPIRED).toString();
+        return  Utils.getJsonObject(CommonResult.SUCCESS).toString();
+
     }
 
     @ResponseBody

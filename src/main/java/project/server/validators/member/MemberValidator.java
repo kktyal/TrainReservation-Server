@@ -1,6 +1,6 @@
-package project.server.validator.member;
+package project.server.validators.member;
 
-import project.server.validator.Validator;
+import project.server.validators.Validator;
 
 
 public enum MemberValidator implements Validator {

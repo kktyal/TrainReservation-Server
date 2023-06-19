@@ -10,14 +10,13 @@ import project.server.SessionConst;
 import project.server.controllers.MyController;
 import project.server.entities.train.ReservationEntity;
 import project.server.entities.train.TrainChargeEntity;
-import project.server.entities.train.TrainStationEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.SessionAuthorizedResult;
 import project.server.enums.interfaces.IResult;
 import project.server.enums.trainResult.ReservationResult;
 import project.server.lang.Pair;
 import project.server.services.train.TrainService;
-import project.server.validator.train.TrainValidator;
+import project.server.validators.train.TrainValidator;
 import project.server.vos.member.MemberVo;
 import project.server.vos.train.*;
 
@@ -25,8 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
 
-import static project.Validator.isValidInteger;
-import static project.Validator.isValidString;
 
 @Controller
 @RequestMapping("/train")

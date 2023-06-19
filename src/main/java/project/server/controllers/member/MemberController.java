@@ -13,14 +13,12 @@ import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
 import project.server.lang.Pair;
 import project.server.services.member.MemberService;
-import project.server.validator.member.MemberValidator;
+import project.server.validators.member.MemberValidator;
 import project.server.vos.member.MemberVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import static project.Validator.isValidInteger;
-import static project.Validator.isValidString;
 
 @Slf4j
 @Controller
@@ -45,9 +43,7 @@ public class MemberController extends MyController {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
-        if (!isValidString(memberAuthCodeEntity.getEmail())) {
-            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
-        }
+
         Enum<? extends IResult> result = memberService.emailSend(memberAuthCodeEntity);
         return Utils.getJsonObject(result).toString();
     }
