@@ -50,7 +50,7 @@ public class TrainController extends MyController {
                 !ServerApplication.trainStations.contains(cntVo.getArriveStation()) ||
                 !TrainValidator.DATE.matches(cntVo.getDate()) ||
                 !TrainValidator.CNT.matches(cntVo.getAdult().toString()) ||
-                !TrainValidator.CNT.matches(cntVo.getKid().toString()) ||
+                !TrainValidator.CNT.matches(cntVo.getChild().toString()) ||
                 !TrainValidator.CNT.matches(cntVo.getOld().toString())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
@@ -147,7 +147,7 @@ public class TrainController extends MyController {
         CntVo cntVo = (CntVo) session.getAttribute(SessionConst.CNT);
 
         //인원수 안맞을 때
-        int cnt = cntVo.getOld() + cntVo.getAdult() + cntVo.getKid();
+        int cnt = cntVo.getOld() + cntVo.getAdult() + cntVo.getChild();
         if (cnt != reservationVo.size()) {
             return Utils.getJsonObject(ReservationResult.NO_MATCH_CNT).toString();
         }

@@ -12,6 +12,6 @@ public class ApiVo {
     private String traingradename;
     private int trainno;
     private String date;
-    private boolean common;
-    private boolean vip;
+    private boolean standard;
+    private boolean premium;
 }

@@ -152,7 +152,7 @@ public class TrainService {
 
         int adultCnt = count.getAdult();
         int oldCnt = count.getOld();
-        int kidCnt = count.getKid();
+        int kidCnt = count.getChild();
 
 
         int ticketCnt = 0;
@@ -321,11 +321,11 @@ public class TrainService {
                 else
                     vip++;
             }
-            if (cntVo.getOld() + cntVo.getKid() + cntVo.getAdult() + vip >= 9) {
-                apiVo.setVip(true);
+            if (cntVo.getOld() + cntVo.getChild() + cntVo.getAdult() + vip > 9) {
+                apiVo.setPremium(true);
             }
-            if (cntVo.getOld() + cntVo.getKid() + cntVo.getAdult() + common >= 20) {
-                apiVo.setCommon(true);
+            if (cntVo.getOld() + cntVo.getChild() + cntVo.getAdult() + common > 20) {
+                apiVo.setStandard(true);
             }
         }
         pair.setKey(CommonResult.SUCCESS);
@@ -345,7 +345,7 @@ public class TrainService {
         /*URL*/
         String urlBuilder = "http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo" + "?" + URLEncoder.encode("serviceKey", "UTF-8") + "=ovMDJk4e%2BY2bRcCR4qJTYDuTlnmFIMOPMmZsPd1rbUJylcSo%2FUyXnFaJWPu1yt4M1ZdnTfH20zVHD91u9HQt1Q%3D%3D" + /*Service Key*/
                 "&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8") + /*페이지번호*/
-                "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("20", "UTF-8") + /*한 페이지 결과 수*/
+                "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("50", "UTF-8") + /*한 페이지 결과 수*/
                 "&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8") + /*데이터 타입(xml, json)*/
                 "&" + URLEncoder.encode("depPlaceId", "UTF-8") + "=" + URLEncoder.encode(departStationCode, "UTF-8") + /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
                 "&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(arriveStationCode, "UTF-8") + /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/

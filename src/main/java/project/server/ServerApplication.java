@@ -27,8 +27,7 @@ public class ServerApplication {
 
 		ServerApplication.trainStations = Collections.unmodifiableList(trainStations);
 		ServerApplication.trainNos = Collections.unmodifiableList(trainNos);
-		String input = "202306192b2de106873c4e0bb37a5a403625de1b";
-		System.out.println(input.length());
+
 	}
 
 
