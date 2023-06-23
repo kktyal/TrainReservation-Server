@@ -17,6 +17,7 @@ import project.server.validators.member.MemberValidator;
 import project.server.vos.member.MemberVo;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 
@@ -89,7 +90,7 @@ public class MemberController extends MyController {
 
     //아이디 찾기 이메일 인증 코드 확인
     @ResponseBody
-    @PostMapping("/findId/matchEmailCode")
+    @PostMapping("/findId/matchEmailCodeAndGiveId")
     public String emailCheckByFindId(@RequestBody MemberAuthCodeEntity memberAuthCodeEntity) {
 
         if (!MemberValidator.EMAIL.matches(memberAuthCodeEntity.getEmail()) ||
@@ -169,13 +170,14 @@ public class MemberController extends MyController {
     //비번 변경
     @ResponseBody
     @PostMapping("/updatePw/applyNewPw")
-    public String updatePw(@RequestBody MemberVo memberVo) {
+    public String updatePw(@RequestBody MemberVo memberVo, HttpServletResponse response) {
 
         if (!MemberValidator.ID.matches(memberVo.getId().toString())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Enum<? extends IResult> result = memberService.updatePw(memberVo);
+        System.out.println(response.getStatus());
         // json 성공 실패 여부 반환, 성공시 login 세션 생성
         return Utils.getJsonObject(result).toString();
     }

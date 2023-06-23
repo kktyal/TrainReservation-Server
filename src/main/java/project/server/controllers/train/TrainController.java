@@ -135,7 +135,7 @@ public class TrainController extends MyController {
 
         //세션 검사
         if (!authorizedCntSession(request).equals(Utils.getJsonObject(CommonResult.SUCCESS).toString())) {
-            return Utils.getJsonObject(SessionAuthorizedResult.CNT_NO_SEESION).toString();
+            return Utils.getJsonObject(SessionAuthorizedResult.CNT_NO_SESSION).toString();
         }
         if (!authorizedLoginSession(request).equals(Utils.getJsonObject(CommonResult.SUCCESS).toString())) {
             return Utils.getJsonObject(SessionAuthorizedResult.MEMBER_NO_SESSION).toString();

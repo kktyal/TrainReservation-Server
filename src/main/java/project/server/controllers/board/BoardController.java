@@ -31,7 +31,7 @@ public class BoardController  extends MyController {
     }
     @ResponseBody
     @PostMapping("select/search")
-    public String selectBySearch(@RequestBody BoardVo vo, HttpServletResponse response){
+    public String selectBySearch(@RequestBody BoardVo vo){
         List<BoardEntity> selectAll = boardService.findBySearch(vo.getSearch());
         return Utils.getJsonObject(CommonResult.SUCCESS,selectAll).toString();
     }
@@ -39,7 +39,6 @@ public class BoardController  extends MyController {
     @PostMapping("select/index")
     public String selectByIndex(@RequestBody BoardVo vo){
         List<BoardEntity> selectByIndex = boardService.findByIndex(vo.getIndex());
-
         return Utils.getJsonObject(CommonResult.SUCCESS,selectByIndex).toString();
     }
 

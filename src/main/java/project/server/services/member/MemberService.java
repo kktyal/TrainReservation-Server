@@ -15,6 +15,7 @@ import project.server.mappers.member.IMemberMapper;
 import project.server.vos.member.MemberVo;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletResponse;
 
 import java.time.Year;
 import java.util.Date;

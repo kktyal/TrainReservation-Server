@@ -71,7 +71,7 @@ public class MyController {
         }
         if (temp == null) {
 
-            return Utils.getJsonObject(SessionAuthorizedResult.CNT_NO_SEESION).toString();
+            return Utils.getJsonObject(SessionAuthorizedResult.CNT_NO_SESSION).toString();
         }
         if (!(temp instanceof CntVo)) {
 
