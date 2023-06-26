@@ -89,10 +89,9 @@ public class TrainService {
         do {
             paymentId = createId();
         } while (trainMapper.selectPaymentId(paymentId).isPresent());
+        Date createdDate = new Date();
         payment.setPaymentId(paymentId);
-        System.out.println("paymentId = " + paymentId);
-        System.out.println("totalPrice = " + totalPrice);
-
+        payment.setCreatedDate(createdDate);
         int savePaymentResult = trainMapper.savePayment(payment);
 
         reservationEntity.setPaymentId(paymentId);
@@ -128,13 +127,16 @@ public class TrainService {
             reservationId = createId();
         } while (trainMapper.selectReservationId(reservationId).isPresent());
         // 만료 날짜 생성
+
+        Date createdDate = new Date();
         Date expiredDate = new Date();
-        expiredDate = DateUtils.addMinutes(expiredDate, 10);
+        expiredDate = DateUtils.addMinutes(createdDate, 10);
 
         //예약
         ReservationVo vo = reservationVo.get(0);
 
         vo.setReservationId(reservationId);
+        vo.setCreatedDate(createdDate);
         vo.setExpiredDate(expiredDate);
 
 

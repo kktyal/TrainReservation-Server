@@ -12,6 +12,7 @@ public class ReservationEntity {
     private String arriveTime;
     private String arriveStation;
     private String date;
+    private Date createdDate;
     private Date expiredDate;
     private Integer memberId;
     private Boolean disuse;
