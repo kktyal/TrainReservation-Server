@@ -32,13 +32,11 @@ public class TrainController extends MyController {
     @Autowired
     private TrainService trainService;
 
-
 //    @ResponseBody
 //    @PostMapping("/test")
 //    public ReservationEntity test() {
 //        return trainService.test().get();
 //    }
-
 
     //Input : 기차 조회 하기
     //Output : 기차 조회 결과
@@ -54,7 +52,6 @@ public class TrainController extends MyController {
                 !TrainValidator.CNT.matches(cntVo.getOld().toString())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
-
 
         HttpSession session = request.getSession(true);
         session.setAttribute(SessionConst.CNT, cntVo);
@@ -163,6 +160,43 @@ public class TrainController extends MyController {
 
         return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
     }
+    //승차권 환불
+    @ResponseBody
+    @PostMapping("/reservation/payment/refund")
+    public String paymentRefund(@RequestBody ReservationVo inputVo) {
+
+        if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+        }
+
+        Pair<Enum<? extends IResult>, Integer> result = trainService.refund(inputVo);
+        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
+    }
+    // 예약 취소
+    @ResponseBody
+    @PostMapping("/reservation/cancel")
+    public String reservationCancel(@RequestBody ReservationVo inputVo) {
+
+        if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+        }
+
+        Pair<Enum<? extends IResult>, Integer> result = trainService.cancel(inputVo);
+        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
+    }
+    //결제하기
+    @ResponseBody
+    @PostMapping("/reservation/payment")
+    public String reservationCancel(@RequestBody ReservationEntity reservationId) {
+
+        if(!TrainValidator.RESERVATIONID.matches(reservationId.getReservationId())){
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
+        }
+
+        Pair<Enum<? extends IResult>, Integer> result = trainService.payment(reservationId);
+
+        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
+    }
 
     //예약내역 페이지
     @ResponseBody
@@ -192,7 +226,7 @@ public class TrainController extends MyController {
 
     //발권 승차권 페이지
     @ResponseBody
-    @PostMapping("/ticket/detail/page")
+    @PostMapping("/ticket")
     public String ticketDetail(@RequestBody ReservationVo inputVo) {
 
         if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
@@ -222,45 +256,6 @@ public class TrainController extends MyController {
 
     }
 
-    //승차권 환불
-    @ResponseBody
-    @PostMapping("/reservation/payment/refund")
-    public String paymentRefund(@RequestBody ReservationVo inputVo) {
-
-        if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
-            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
-        }
-
-        Pair<Enum<? extends IResult>, Integer> result = trainService.refund(inputVo);
-        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
-    }
-
-    // 예약 취소
-    @ResponseBody
-    @PostMapping("/reservation/cancel")
-    public String reservationCancel(@RequestBody ReservationVo inputVo) {
-
-        if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
-            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
-        }
-
-        Pair<Enum<? extends IResult>, Integer> result = trainService.cancel(inputVo);
-        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
-    }
-
-    //결제하기
-    @ResponseBody
-    @PostMapping("/reservation/payment")
-    public String reservationCancel(@RequestBody ReservationEntity reservationId) {
-
-        if(!TrainValidator.RESERVATIONID.matches(reservationId.getReservationId())){
-            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
-        }
-
-        Pair<Enum<? extends IResult>, Integer> result = trainService.payment(reservationId);
-
-        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
-    }
 
 
 }

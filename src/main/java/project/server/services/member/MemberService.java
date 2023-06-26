@@ -3,7 +3,7 @@ package project.server.services.member;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+
 import project.Utils;
 import project.server.entities.member.MemberAuthCodeEntity;
 import project.server.enums.CommonResult;
@@ -15,7 +15,7 @@ import project.server.mappers.member.IMemberMapper;
 import project.server.vos.member.MemberVo;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletResponse;
+
 
 import java.time.Year;
 import java.util.Date;
@@ -27,7 +27,6 @@ import java.util.Random;
 public class MemberService {
 
     private final IMemberMapper memberMapper;//변수로 만들때 I는 빼고 만드는게 국룰
-
 
     public MemberService(IMemberMapper memberMapper) {
         this.memberMapper = memberMapper;

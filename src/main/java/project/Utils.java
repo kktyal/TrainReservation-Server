@@ -27,9 +27,7 @@ public class Utils {
     }
     public static Pair<Enum<? extends IResult>, Integer> getIngegerPair(Integer result) {
         Pair<Enum<? extends IResult>, Integer> pair = new Pair<>(null, null);
-        System.out.println("++");
-        System.out.println("result = " + result);
-        System.out.println("++");
+
         if (result == 0) {
             pair.setKey(TrainResult.NO_SEARCH_DATA);
         } else {
