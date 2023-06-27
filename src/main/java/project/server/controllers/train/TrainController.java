@@ -157,8 +157,9 @@ public class TrainController extends MyController {
         if (result.getKey().equals(ReservationResult.SEAT_DUPLICATED)) {
             return Utils.getJsonObject(result.getKey()).toString();
         }
-
-        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
+        Map<String,String> data = new HashMap<>();
+        data.put("reservationId", result.getValue());
+        return Utils.getJsonObject(result.getKey(), data).toString();
     }
     //승차권 환불
     @ResponseBody

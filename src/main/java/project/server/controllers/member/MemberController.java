@@ -19,6 +19,8 @@ import project.server.vos.member.MemberVo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Slf4j
@@ -69,7 +71,13 @@ public class MemberController extends MyController {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
         Pair<Enum<? extends IResult>, Integer> pair = memberService.matchEmailCodeAndGiveId(memberAuthCodeEntity);
-        return Utils.getJsonObject(pair.getKey(),pair.getValue()).toString();
+//        Map<String, Integer> data = new HashMap<>();
+
+
+
+//
+//        data.put("memberId", pair.getValue());
+        return Utils.getJsonObject(pair.getKey(), pair.getValue()).toString();
     }
 
 
