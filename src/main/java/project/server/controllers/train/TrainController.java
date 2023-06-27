@@ -78,17 +78,17 @@ public class TrainController extends MyController {
     // output : 기차 요금 조회결과
     @ResponseBody
     @PostMapping("/charge")
-    public Map<String, Object> charge(@RequestBody TrainChargeVo charge) {
+    public String charge(@RequestBody TrainChargeVo charge) {
 
         if (!ServerApplication.trainStations.contains(charge.getDepartStation())||
                 !ServerApplication.trainStations.contains(charge.getArriveStation())){
 
-            return Utils.getJsonObject(CommonResult.INPUT_ERROR,"");
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Pair<Enum<? extends IResult>, TrainChargeEntity> result = trainService.selectCharge(charge);
 
-        return Utils.getJsonObject(result.getKey(), result.getValue());
+        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
 
     }
 

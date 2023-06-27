@@ -64,9 +64,9 @@ public class Utils {
     }
 
 
-    public static Map<String, Object> getJsonObject(Enum<? extends IResult> result, Object data) {
+    public static JSONObject getJsonObject(Enum<? extends IResult> result, Object data) {
+        JSONObject jsonData = new JSONObject();
 
-        Map<String, Object> jsonData = new HashMap<>();
         if (result.equals(CommonResult.SUCCESS)) {
             jsonData.put("result", result.name().toLowerCase());
             jsonData.put("data", data);
