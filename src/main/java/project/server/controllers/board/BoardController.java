@@ -2,10 +2,7 @@ package project.server.controllers.board;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import project.Utils;
 import project.server.controllers.MyController;
 import project.server.entities.board.BoardEntity;
@@ -22,6 +19,12 @@ public class BoardController  extends MyController {
 
     @Autowired
     private BoardService boardService;
+
+    @ResponseBody
+    @GetMapping("/test")
+    public String test(){
+        return "hello";
+    }
 
     @ResponseBody
     @PostMapping("select")

@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.12'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'war'
 }
 
 group = 'project'
@@ -26,6 +27,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	//마이 바티스 추가
@@ -40,7 +42,18 @@ dependencies {
 	//시간
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 
+	//내장톰캣 추가
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
+
+}
+
+bootWar.enabled = true
+war.enabled = false
+
+//war 이름
+bootWar{
+	archiveName("trainReservation.war")
 }
 
 tasks.named('test') {

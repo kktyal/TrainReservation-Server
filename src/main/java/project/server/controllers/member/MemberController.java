@@ -101,7 +101,7 @@ public class MemberController extends MyController {
 
         if (!MemberValidator.EMAIL.matches(memberVo.getEmail()) || !MemberValidator.PHONE.matches(memberVo.getPhone())
                 || !MemberValidator.NAME.matches(memberVo.getName()) || !MemberValidator.GENDER.matches(memberVo.getGender())
-                || !MemberValidator.BIRTH.matches(memberVo.getBirth())) {
+                || !MemberValidator.BIRTH.matches(memberVo.getBirth()) ||!MemberValidator.PASSWORD.matches(memberVo.getPw())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
         Enum<? extends IResult> result = memberService.register(memberVo);
@@ -135,7 +135,7 @@ public class MemberController extends MyController {
     @PostMapping("/updatePassword")
     public String updatePw(@RequestBody MemberVo memberVo, HttpServletResponse response) {
 
-        if (!MemberValidator.ID.matches(memberVo.getId().toString())) {
+        if (!MemberValidator.ID.matches(memberVo.getId().toString())||!MemberValidator.PASSWORD.matches(memberVo.getPw())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
         Enum<? extends IResult> result = memberService.updatePw(memberVo);

@@ -28,9 +28,9 @@ public interface ITrainMapper {
     List<String> selectPremiumSeats();
 
 
-    @Select("select `station_name` from `good`.`train_station`")
+    @Select("select `station_name` from `train_station`")
     List<String> selectTrainStations();
-    @Select("select `train_no` from `good`.`train_no`")
+    @Select("select `train_no` from `train_no`")
     List<Integer> selectTrainNos();
 
     int saveReservation(ReservationEntity reservation);
