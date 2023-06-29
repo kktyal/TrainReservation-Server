@@ -24,6 +24,9 @@ public interface ITrainMapper {
     List<ReservationVo> showReservation(String reservationId);
     List<ReservationVo> selectReservationByMemberId (Integer memberId);
     List<TicketEntity> selectTicketByReservationId(String reservationId);
+    List<String> selectStandardSeats();
+    List<String> selectPremiumSeats();
+
 
     @Select("select `station_name` from `good`.`train_station`")
     List<String> selectTrainStations();

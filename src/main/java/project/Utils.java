@@ -15,6 +15,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class Utils {
+
+
+
     public static Pair<Enum<? extends IResult>, List<?>> getListPair(List<?> result) {
         Pair<Enum<? extends IResult>, List<?>> pair = new Pair<>(null, null);
         if (result.size() == 0) {
@@ -25,6 +28,23 @@ public class Utils {
         }
         return pair;
     }
+    public static Pair<Enum<? extends IResult>, Map<String,List<String>>> getListPair(List<String> premium,List<String> standard) {
+        Pair<Enum<? extends IResult>, Map<String,List<String>>> pair = new Pair<>(null, null);
+        if (premium.size() == 0 || standard.size()==0) {
+            pair.setKey(TrainResult.NO_SEARCH_DATA);
+        } else {
+            pair.setKey(CommonResult.SUCCESS);
+            Map<String,List<String>> result = new HashMap<>();
+
+            result.put("premium",premium);
+            result.put("standard",standard);
+
+            pair.setValue(result);
+
+        }
+        return pair;
+    }
+
     public static Pair<Enum<? extends IResult>, Integer> getIngegerPair(Integer result) {
         Pair<Enum<? extends IResult>, Integer> pair = new Pair<>(null, null);
 

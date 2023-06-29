@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.Utils;
+import project.server.ServerApplication;
 import project.server.entities.train.*;
 import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
@@ -271,6 +272,12 @@ public class TrainService {
 
         return Utils.getListPair(result);
     }
+    public List<String>getPremiumSeats(){
+        return this.trainMapper.selectPremiumSeats();
+    }
+    public List<String>getStandardSeats(){
+        return this.trainMapper.selectStandardSeats();
+    }
 
     @Transactional
     public Pair<Enum<? extends IResult>, List<ReservationVo>> selectSeat(ReservationVo vo) {
@@ -299,11 +306,13 @@ public class TrainService {
         Pair<Enum<? extends IResult>, List<ApiVo>> pair = getApi(cntVo);
 
         if (pair.getKey() == InquiryResult.NO_SEARCH_DATA) {
+            System.out.println("1");
             pair.setKey(InquiryResult.NO_SEARCH_DATA);
             pair.setValue(null);
             return pair;
         }
         if (pair.getKey() == InquiryResult.API_ERROR) {
+            System.out.println("2");
             pair.setKey(InquiryResult.API_ERROR);
             pair.setValue(null);
             return pair;
@@ -313,20 +322,20 @@ public class TrainService {
 
 
         for (ApiVo apiVo : pair.getValue()) {
-            int common = 0;
-            int vip = 0;
+            int standard = 0;
+            int premium = 0;
             List<ReservationVo> soldSeat = trainMapper.findSoldSeat(apiVo);
 
             for (ReservationVo reservationVo : soldSeat) {
                 if (reservationVo.getCarriage() != 2)
-                    common++;
+                    standard++;
                 else
-                    vip++;
+                    premium++;
             }
-            if (cntVo.getOld() + cntVo.getChild() + cntVo.getAdult() + vip > 9) {
+            if (cntVo.getOld() + cntVo.getChild() + cntVo.getAdult() + premium > ServerApplication.premiumSeats.size()) {
                 apiVo.setPremium(true);
             }
-            if (cntVo.getOld() + cntVo.getChild() + cntVo.getAdult() + common > 20) {
+            if (cntVo.getOld() + cntVo.getChild() + cntVo.getAdult() + standard > ServerApplication.standardSeats.size()) {
                 apiVo.setStandard(true);
             }
         }
@@ -342,21 +351,35 @@ public class TrainService {
         departStationCode = departStationCode != null ? departStationCode : "";
         String arriveStationCode = transferStationName(cntVo.getArriveStation()).getStationCode();
         arriveStationCode = arriveStationCode != null ? arriveStationCode : "";
+        System.out.println("arriveStationCode = " + arriveStationCode);
+        System.out.println("departStationCode = " + departStationCode);
+        System.out.println("cntVo.getDate() = " + cntVo.getDate());
 
 
-        /*URL*/
-        String urlBuilder = "http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo" + "?" + URLEncoder.encode("serviceKey", "UTF-8") + "=ovMDJk4e%2BY2bRcCR4qJTYDuTlnmFIMOPMmZsPd1rbUJylcSo%2FUyXnFaJWPu1yt4M1ZdnTfH20zVHD91u9HQt1Q%3D%3D" + /*Service Key*/
-                "&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8") + /*페이지번호*/
-                "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("50", "UTF-8") + /*한 페이지 결과 수*/
-                "&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8") + /*데이터 타입(xml, json)*/
-                "&" + URLEncoder.encode("depPlaceId", "UTF-8") + "=" + URLEncoder.encode(departStationCode, "UTF-8") + /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
-                "&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(arriveStationCode, "UTF-8") + /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
-                "&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(cntVo.getDate(), "UTF-8") + /*출발일(YYYYMMDD)*/
-                "&" + URLEncoder.encode("trainGradeCode", "UTF-8") + "=" + URLEncoder.encode("17", "UTF-8"); /*차량종류코드*/
-        URL url = new URL(urlBuilder);
+//        /*URL*/
+//        String urlBuilder = "http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo" + "?" + URLEncoder.encode("serviceKey", "UTF-8") + "=ovMDJk4e%2BY2bRcCR4qJTYDuTlnmFIMOPMmZsPd1rbUJylcSo%2FUyXnFaJWPu1yt4M1ZdnTfH20zVHD91u9HQt1Q%3D%3D" + /*Service Key*/
+//                "&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8") + /*페이지번호*/
+//                "&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("50", "UTF-8") + /*한 페이지 결과 수*/
+//                "&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8") + /*데이터 타입(xml, json)*/
+//                "&" + URLEncoder.encode("depPlaceId", "UTF-8") + "=" + URLEncoder.encode(departStationCode, "UTF-8") + /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
+//                "&" + URLEncoder.encode("arrPlaceId", "UTF-8") + "=" + URLEncoder.encode(arriveStationCode, "UTF-8") + /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
+//                "&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(cntVo.getDate(), "UTF-8") + /*출발일(YYYYMMDD)*/
+//                "&" + URLEncoder.encode("trainGradeCode", "UTF-8") + "=" + URLEncoder.encode("17", "UTF-8"); /*차량종류코드*/
+//        URL url = new URL(urlBuilder);
+        StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo"); /*URL*/
+        urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=Gcqxaud5Om2bmKrfPZ29wv5Ri2exsBYPXbPm%2BNCLjb3qvthZoLIJN86AEVCHUhKIc3OMmRUdMVCm%2Bkq70SzBJQ%3D%3D"); /*Service Key*/
+        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
+        urlBuilder.append("&" + URLEncoder.encode("_type","UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /*데이터 타입(xml, json)*/
+        urlBuilder.append("&" + URLEncoder.encode("depPlaceId","UTF-8") + "=" + URLEncoder.encode(departStationCode, "UTF-8")); /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
+        urlBuilder.append("&" + URLEncoder.encode("arrPlaceId","UTF-8") + "=" + URLEncoder.encode(arriveStationCode, "UTF-8")); /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
+        urlBuilder.append("&" + URLEncoder.encode("depPlandTime","UTF-8") + "=" + URLEncoder.encode(cntVo.getDate(), "UTF-8")); /*출발일(YYYYMMDD)*/
+        urlBuilder.append("&" + URLEncoder.encode("trainGradeCode","UTF-8") + "=" + URLEncoder.encode("17", "UTF-8")); /*차량종류코드*/
+        URL url = new URL(urlBuilder.toString());
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
+
         System.out.println("Response code: " + conn.getResponseCode());
 
         BufferedReader rd;
@@ -364,6 +387,7 @@ public class TrainService {
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         } else {
             rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+            System.out.println("3");
             pair.setKey(InquiryResult.API_ERROR);
 
             return pair;

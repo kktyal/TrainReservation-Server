@@ -9,6 +9,7 @@ import project.server.ServerApplication;
 import project.server.SessionConst;
 import project.server.controllers.MyController;
 import project.server.entities.train.ReservationEntity;
+import project.server.entities.train.TicketEntity;
 import project.server.entities.train.TrainChargeEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.SessionAuthorizedResult;
@@ -66,7 +67,7 @@ public class TrainController extends MyController {
     @ResponseBody
     @PostMapping("/time")
     public String time(@RequestBody TrainTimeVo time) {
-        if (!ServerApplication.trainNos.contains(time.getTrainNo())){
+        if (!ServerApplication.trainNos.contains(time.getTrainNo())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -80,8 +81,8 @@ public class TrainController extends MyController {
     @PostMapping("/charge")
     public String charge(@RequestBody TrainChargeVo charge) {
 
-        if (!ServerApplication.trainStations.contains(charge.getDepartStation())||
-                !ServerApplication.trainStations.contains(charge.getArriveStation())){
+        if (!ServerApplication.trainStations.contains(charge.getDepartStation()) ||
+                !ServerApplication.trainStations.contains(charge.getArriveStation())) {
 
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
@@ -92,16 +93,25 @@ public class TrainController extends MyController {
 
     }
 
+    @ResponseBody
+    @PostMapping("/seat/list")
+    public String getAllSeat() {
+
+        Pair<Enum<? extends IResult>,Map<String,List<String>>> result = Utils.getListPair(ServerApplication.premiumSeats,ServerApplication.standardSeats);
+        return Utils.getJsonObject(result.getKey(),result.getValue()).toString();
+    }
+
+
     // input : 기차 자리 조회
     // output : 기차 자리 조회결과
     @ResponseBody
     @PostMapping("/seat")
     public String seat(@RequestBody ReservationVo vo) {
         //검증
-        if(!ServerApplication.trainNos.contains(vo.getTrainNo())||
-        !TrainValidator.DATE.matches(vo.getDate())||
-        !TrainValidator.TIME.matches(vo.getArriveTime())||
-        !TrainValidator.TIME.matches(vo.getDepartTime())){
+        if (!ServerApplication.trainNos.contains(vo.getTrainNo()) ||
+                !TrainValidator.DATE.matches(vo.getDate()) ||
+                !TrainValidator.TIME.matches(vo.getArriveTime()) ||
+                !TrainValidator.TIME.matches(vo.getDepartTime())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -117,14 +127,14 @@ public class TrainController extends MyController {
     public String reservation(@RequestBody List<ReservationVo> reservationVo, HttpServletRequest request) {
 
         for (ReservationVo vo : reservationVo) {
-            if(!ServerApplication.trainNos.contains(vo.getTrainNo())||
-            !ServerApplication.trainStations.contains(vo.getArriveStation())||
-            !ServerApplication.trainStations.contains(vo.getDepartStation())||
-            !TrainValidator.TIME.matches(vo.getDepartTime())||
-            !TrainValidator.TIME.matches(vo.getArriveTime())||
-            !TrainValidator.DATE.matches(vo.getDate())||
-            !TrainValidator.CARRIAGE.matches(vo.getCarriage().toString())||
-            !TrainValidator.SEAT.matches(vo.getSeat())){
+            if (!ServerApplication.trainNos.contains(vo.getTrainNo()) ||
+                    !ServerApplication.trainStations.contains(vo.getArriveStation()) ||
+                    !ServerApplication.trainStations.contains(vo.getDepartStation()) ||
+                    !TrainValidator.TIME.matches(vo.getDepartTime()) ||
+                    !TrainValidator.TIME.matches(vo.getArriveTime()) ||
+                    !TrainValidator.DATE.matches(vo.getDate()) ||
+                    !TrainValidator.CARRIAGE.matches(vo.getCarriage().toString()) ||
+                    !TrainValidator.SEAT.matches(vo.getSeat())) {
                 return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
             }
         }
@@ -157,40 +167,43 @@ public class TrainController extends MyController {
         if (result.getKey().equals(ReservationResult.SEAT_DUPLICATED)) {
             return Utils.getJsonObject(result.getKey()).toString();
         }
-        Map<String,String> data = new HashMap<>();
+        Map<String, String> data = new HashMap<>();
         data.put("reservationId", result.getValue());
         return Utils.getJsonObject(result.getKey(), data).toString();
     }
+
     //승차권 환불
     @ResponseBody
     @PostMapping("/reservation/payment/refund")
     public String paymentRefund(@RequestBody ReservationVo inputVo) {
 
-        if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
+        if (!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Pair<Enum<? extends IResult>, Integer> result = trainService.refund(inputVo);
         return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
     }
+
     // 예약 취소
     @ResponseBody
     @PostMapping("/reservation/cancel")
     public String reservationCancel(@RequestBody ReservationVo inputVo) {
 
-        if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
+        if (!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
         Pair<Enum<? extends IResult>, Integer> result = trainService.cancel(inputVo);
         return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
     }
+
     //결제하기
     @ResponseBody
     @PostMapping("/reservation/payment")
     public String reservationCancel(@RequestBody ReservationEntity reservationId) {
 
-        if(!TrainValidator.RESERVATIONID.matches(reservationId.getReservationId())){
+        if (!TrainValidator.RESERVATIONID.matches(reservationId.getReservationId())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -204,7 +217,7 @@ public class TrainController extends MyController {
     @PostMapping("/reservation/detail")
     public String reservationDetail(@RequestBody ReservationEntity entity) {
 
-        if(!TrainValidator.RESERVATIONID.matches(entity.getReservationId())){
+        if (!TrainValidator.RESERVATIONID.matches(entity.getReservationId())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
         Pair<Enum<? extends IResult>, List<?>> result = trainService.reservationDetail(entity);
@@ -217,7 +230,7 @@ public class TrainController extends MyController {
     @PostMapping("/reservation/payment/refund/page")
     public String reservationRefundPage(@RequestBody ReservationVo inputVo) {
 
-        if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
+        if (!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -230,7 +243,7 @@ public class TrainController extends MyController {
     @PostMapping("/ticket")
     public String ticketDetail(@RequestBody ReservationVo inputVo) {
 
-        if(!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())){
+        if (!TrainValidator.RESERVATIONID.matches(inputVo.getReservationId())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
 
@@ -256,7 +269,6 @@ public class TrainController extends MyController {
         return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
 
     }
-
 
 
 }
