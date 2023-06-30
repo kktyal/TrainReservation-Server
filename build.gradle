@@ -48,8 +48,8 @@ dependencies {
 
 }
 
-bootWar.enabled = true
-war.enabled = false
+//bootWar.enabled = true
+//war.enabled = false
 
 //war 이름
 bootWar{

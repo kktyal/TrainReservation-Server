@@ -40,14 +40,17 @@ public class TrainService {
         this.trainMapper = trainMapper;
     }
 
-    public Optional<ReservationEntity> test() {
-        LocalDate currentDate = LocalDate.now();
-        UUID uuid = UUID.randomUUID();
-        String random = currentDate.toString().concat(uuid.toString());
-        System.out.println(random);
-        return trainMapper.selectReservationId("20230613");
-    }
+//    public Optional<ReservationEntity> test() {
+//        LocalDate currentDate = LocalDate.now();
+//        UUID uuid = UUID.randomUUID();
+//        String random = currentDate.toString().concat(uuid.toString());
+//        System.out.println(random);
+//        return trainMapper.selectReservationId("20230613");
+//    }
 
+    public List<ReservationEntity> test(){
+        return trainMapper.test();
+    }
 
     public Pair<Enum<? extends IResult>, Integer> cancel(ReservationVo inputVo) {
 
@@ -72,18 +75,12 @@ public class TrainService {
         PaymentEntity payment = new PaymentEntity();
 
         // 총 금액을 알기 위해 ticket에서 age, price 조회
-        double totalPrice = 0;
+        int totalPrice = 0;
         List<TicketEntity> ticketEntities = trainMapper.selectTicketByReservationId(reservationEntity.getReservationId());
         for (TicketEntity ticketEntity : ticketEntities) {
-            if (ticketEntity.getAge().equals("adult")) {
-                totalPrice += ticketEntity.getPrice();
-            } else if (ticketEntity.getAge().equals("old")) {
-                totalPrice += (int) ticketEntity.getPrice() * 0.8;
-            } else {
-                totalPrice += (int) ticketEntity.getPrice() * 0.7;
-            }
+           totalPrice+=ticketEntity.getDiscountedPrice();
         }
-        payment.setTotalPrice((int) Math.floor(totalPrice / 100) * 100);
+        payment.setTotalPrice(totalPrice);
 
         // paymentid 세팅
         String paymentId;
@@ -157,6 +154,19 @@ public class TrainService {
         int oldCnt = count.getOld();
         int kidCnt = count.getChild();
 
+        double oldDiscountRate = 0.0;
+        double childDiscountRate = 0.0;
+        List<AgeEntity> ageEntityList = trainMapper.selectAge();
+        for (AgeEntity ageEntity : ageEntityList) {
+            if(ageEntity.getKinds().equals("child")){
+                childDiscountRate = ageEntity.getDiscountRate();
+            }else if(ageEntity.getKinds().equals("old")){
+                oldDiscountRate = ageEntity.getDiscountRate();
+            }
+        }
+        System.out.println("childDiscountRate = " + childDiscountRate);
+        System.out.println("oldDiscountRate = " + oldDiscountRate);
+
 
         int ticketCnt = 0;
         for (ReservationVo seat : reservationVo) {
@@ -178,14 +188,17 @@ public class TrainService {
             }
             if (adultCnt > 0) {
                 ticket.setAge("adult");
+                ticket.setDiscountedPrice(ticket.getPrice());
 
                 adultCnt--;
             } else if (oldCnt > 0) {
                 ticket.setAge("old");
+                ticket.setDiscountedPrice((int) Math.floor((ticket.getPrice() * oldDiscountRate) / 100) * 100);
 
                 oldCnt--;
             } else {
                 ticket.setAge("kid");
+                ticket.setDiscountedPrice((int) Math.floor((ticket.getPrice() * childDiscountRate) / 100) * 100);
 
             }
             ticketCnt += trainMapper.saveTicket(ticket);
@@ -275,6 +288,7 @@ public class TrainService {
     public List<String>getPremiumSeats(){
         return this.trainMapper.selectPremiumSeats();
     }
+
     public List<String>getStandardSeats(){
         return this.trainMapper.selectStandardSeats();
     }

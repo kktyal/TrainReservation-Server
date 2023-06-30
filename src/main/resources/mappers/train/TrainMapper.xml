@@ -15,11 +15,11 @@
     </select>
 
 
-    <select id="test" resultType="int">
-        select `index`
-        from `train_station`
-        where `station_name` = '수서'
-    </select>
+<!--    <select id="test" resultType="int">-->
+<!--        select `index`-->
+<!--        from `train_station`-->
+<!--        where `station_name` = '수서'-->
+<!--    </select>-->
 
 
     <select id="selectTicketByReservationId" resultType="TicketEntity">
@@ -147,7 +147,7 @@
     </insert>
     <insert id="saveTicket">
         insert into `ticket`
-        values (#{ticketId}, #{trainNo}, #{carriage}, #{seat}, #{reservationId}, #{age}, #{price})
+        values (#{ticketId}, #{trainNo}, #{carriage}, #{seat}, #{reservationId}, #{age}, #{price},#{discountedPrice})
     </insert>
     <insert id="savePayment">
         insert into `payment`(`payment_id`, `total_price`,`created_date`)
@@ -180,7 +180,9 @@
                `t`.`seat`,
                `t`.`age`,
                `t`.`price`,
-               `t`.`ticket_id`
+               `t`.`ticket_id`,
+                `t`.`discounted_price`
+
         from `reservation` as `r`
                  inner join `ticket` as `t` on `r`.`reservation_id` = `t`.`reservation_id`
         where `r`.`reservation_id` = #{reservationId}

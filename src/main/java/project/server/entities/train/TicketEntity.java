@@ -1,7 +1,6 @@
 package project.server.entities.train;
 
 import lombok.Data;
-import org.springframework.validation.annotation.Validated;
 
 @Data
 public class TicketEntity {
@@ -13,4 +12,5 @@ public class TicketEntity {
     private String reservationId;
     private String age;
     private Integer price;
+    private Integer discountedPrice;
 }

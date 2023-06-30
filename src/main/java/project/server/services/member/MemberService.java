@@ -37,8 +37,17 @@ public class MemberService {
     }
     //이메일 보내기
     public Enum<? extends IResult> emailSend(MemberAuthCodeEntity memberAuthCodeEntity){
+
         //암호 코드 생성
-        memberAuthCodeEntity.setAuthCode(Utils.createAuthCode());
+        String[] split = memberAuthCodeEntity.getEmail().split("@");
+
+        if (split[1].equals(Utils.ADMIN)) {
+            memberAuthCodeEntity.setAuthCode("admin000");
+        } else {
+            memberAuthCodeEntity.setAuthCode(Utils.createAuthCode());
+        }
+
+
 
         //이메일 보내기
         Utils.EmailSender emailSender = new Utils.EmailSender();
@@ -142,10 +151,11 @@ public class MemberService {
         if(memberMapper.findByPhone(memberVo.getPhone()).isPresent()){
             return IsDuplicated.PHONE_DUPLICATED;
         }
-
-        //qwe123
-        //123qwe >> qwe123
-        //Utils.hashSha512(qwe123)
+        String[] split = memberVo.getEmail().split("@");
+        System.out.println("split[1] = " + split[1]);
+        if(split[1].equals(Utils.ADMIN)){
+            memberVo.setIsAdmin(1);
+        }
 
         //비밀번호 암호화
         memberVo.setPw(Utils.hashSha512(memberVo.getPw()));

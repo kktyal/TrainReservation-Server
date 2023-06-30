@@ -1,6 +1,7 @@
 package project.server.controllers.train;
 
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +10,6 @@ import project.server.ServerApplication;
 import project.server.SessionConst;
 import project.server.controllers.MyController;
 import project.server.entities.train.ReservationEntity;
-import project.server.entities.train.TicketEntity;
 import project.server.entities.train.TrainChargeEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.SessionAuthorizedResult;
@@ -33,11 +33,17 @@ public class TrainController extends MyController {
     @Autowired
     private TrainService trainService;
 
-//    @ResponseBody
-//    @PostMapping("/test")
-//    public ReservationEntity test() {
-//        return trainService.test().get();
-//    }
+
+
+
+    @ResponseBody
+    @PostMapping("/test")
+    public String test() {
+        List<ReservationEntity> test = trainService.test();
+        JSONObject result = new JSONObject();
+        result.put("data",test);
+        return result.toString();
+    }
 
     //Input : 기차 조회 하기
     //Output : 기차 조회 결과

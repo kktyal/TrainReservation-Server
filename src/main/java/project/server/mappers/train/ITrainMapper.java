@@ -11,7 +11,12 @@ import java.util.Optional;
 
 @Mapper
 public interface ITrainMapper {
-    int test();
+    @Select("select member_id from good.`reservation` ")
+    List<ReservationEntity> test();
+
+    @Select("select * from `age`")
+    List<AgeEntity>selectAge();
+
     Optional<TrainStationEntity>findByName(String name);
     Optional<TrainChargeEntity> selectCharge(TrainChargeVo trainChargeVo);
     Optional<ReservationEntity> selectReservationId(String id);

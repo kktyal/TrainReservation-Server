@@ -63,8 +63,8 @@
 
 
     <insert id="save">
-        insert into member (`id`, `email`, `phone`, `pw`, `name`, `gender`, `birth`)
-            value (#{id}, #{email}, #{phone}, #{pw}, #{name},#{gender},#{birth})
+        insert into member (`id`, `email`, `phone`, `pw`, `name`, `gender`, `birth`,`is_admin`)
+            value (#{id}, #{email}, #{phone}, #{pw}, #{name},#{gender},#{birth},#{isAdmin})
     </insert>
 
 

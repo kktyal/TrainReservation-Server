@@ -12,6 +12,7 @@ public class ReservationVo extends ReservationEntity {
     private String seat;
     private String age;
     private Integer price;
+    private Integer discountedPrice;
     private Integer ticketCnt;
     private String ticketId;
 

@@ -11,4 +11,5 @@ public class MemberEntity {
     private String name;
     private String gender;
     private String birth;
+    private Integer isAdmin;
 }

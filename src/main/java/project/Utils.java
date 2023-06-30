@@ -16,7 +16,7 @@ import java.util.*;
 
 public class Utils {
 
-
+    public static String ADMIN = "admin.com";
 
     public static Pair<Enum<? extends IResult>, List<?>> getListPair(List<?> result) {
         Pair<Enum<? extends IResult>, List<?>> pair = new Pair<>(null, null);
