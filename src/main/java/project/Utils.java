@@ -96,6 +96,20 @@ public class Utils {
         }
         return jsonData;
     }
+    public static JSONObject getJsonObject(Enum<? extends IResult> result, JSONObject data) {
+        JSONObject jsonData = new JSONObject();
+
+        if (result.equals(CommonResult.SUCCESS)) {
+            jsonData.put("result", result.name().toLowerCase());
+            jsonData.put("data", data);
+        } else {
+            jsonData.put("result", CommonResult.FAILURE.name().toLowerCase());
+            jsonData.put("message", result.name().toLowerCase());
+        }
+        return jsonData;
+    }
+
+
     public static JSONObject getJsonObject(Enum<? extends IResult> result, Map<?,?> data) {
         JSONObject jsonData = new JSONObject();
 

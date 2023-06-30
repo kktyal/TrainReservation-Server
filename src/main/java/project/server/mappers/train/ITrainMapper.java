@@ -38,6 +38,8 @@ public interface ITrainMapper {
     @Select("select `train_no` from `train_no`")
     List<Integer> selectTrainNos();
 
+    @Select(" select count(`reservation_id`) from `reservation` where `member_id` = #{memberId}")
+    int selectReservationCntByMemberId(Integer memberId);
     int saveReservation(ReservationEntity reservation);
     int saveTicket(TicketEntity ticket);
     int savePayment(PaymentEntity payment);

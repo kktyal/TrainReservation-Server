@@ -475,7 +475,9 @@ public class TrainService {
         Date now = new Date();
         trainMapper.updateDisuse(now);
     }
-
+    public int selectReservationCntByMemberId(Integer memberId){
+        return trainMapper.selectReservationCntByMemberId(memberId);
+    }
     public List<String> getAllTranStations() {
         return this.trainMapper.selectTrainStations();
     }

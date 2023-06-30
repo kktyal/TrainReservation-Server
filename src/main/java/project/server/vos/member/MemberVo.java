@@ -11,4 +11,5 @@ public class MemberVo extends MemberEntity {
     private Date createdOn;
     private Date expiresOn;
     private boolean isExpired;
+    private int reservationCnt;
 }

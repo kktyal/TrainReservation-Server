@@ -13,6 +13,7 @@ import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
 import project.server.lang.Pair;
 import project.server.services.member.MemberService;
+import project.server.services.train.TrainService;
 import project.server.validators.member.MemberValidator;
 import project.server.vos.member.MemberVo;
 
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -31,6 +33,8 @@ public class MemberController extends MyController {
     @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private TrainService trainService;
 
     @ResponseBody
     @PostMapping("/test")
@@ -163,7 +167,20 @@ public class MemberController extends MyController {
         if (result.getKey().equals(CommonResult.SUCCESS)) {
             HttpSession session = request.getSession(true);
             session.setAttribute(SessionConst.LOGIN_MEMBER, result.getValue());
+
+            JSONObject jsonObject = new JSONObject();
+            int reservationCnt = trainService.selectReservationCntByMemberId(memberVo.getId());
+            jsonObject.put("memberName", result.getValue().getName());
+            jsonObject.put("reservationCnt",reservationCnt);
+
+            return Utils.getJsonObject(result.getKey(),jsonObject).toString();
+
         }
+
+
+
+
+
         return Utils.getJsonObject(result.getKey()).toString();
     }
 

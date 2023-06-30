@@ -95,7 +95,12 @@ public class TrainController extends MyController {
 
         Pair<Enum<? extends IResult>, TrainChargeEntity> result = trainService.selectCharge(charge);
 
-        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("standard",result.getValue().getCharge());
+        jsonObject.put("premium",result.getValue().getChargeVip());
+
+
+        return Utils.getJsonObject(result.getKey(), jsonObject).toString();
 
     }
 
@@ -275,6 +280,10 @@ public class TrainController extends MyController {
         return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
 
     }
+
+
+
+
 
 
 }
