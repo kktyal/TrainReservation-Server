@@ -152,7 +152,7 @@ public class TrainService {
 
         int adultCnt = count.getAdult();
         int oldCnt = count.getOld();
-        int kidCnt = count.getChild();
+        int childCnt = count.getChild();
 
         double oldDiscountRate = 0.0;
         double childDiscountRate = 0.0;
@@ -197,13 +197,13 @@ public class TrainService {
 
                 oldCnt--;
             } else {
-                ticket.setAge("kid");
+                ticket.setAge("child");
                 ticket.setDiscountedPrice((int) Math.floor((ticket.getPrice() * childDiscountRate) / 100) * 100);
 
             }
             ticketCnt += trainMapper.saveTicket(ticket);
         }
-        if (reservationCnt != 1 && ticketCnt != adultCnt + kidCnt + oldCnt) {
+        if (reservationCnt != 1 && ticketCnt != adultCnt + childCnt + oldCnt) {
             pair.setKey(CommonResult.FAILURE);
             return pair;
         }
