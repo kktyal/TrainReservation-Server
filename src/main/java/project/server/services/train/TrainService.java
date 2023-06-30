@@ -127,7 +127,7 @@ public class TrainService {
         // 만료 날짜 생성
 
         Date createdDate = new Date();
-        Date expiredDate = new Date();
+        Date expiredDate ;
         expiredDate = DateUtils.addMinutes(createdDate, 10);
 
         //예약
@@ -383,7 +383,7 @@ public class TrainService {
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=Gcqxaud5Om2bmKrfPZ29wv5Ri2exsBYPXbPm%2BNCLjb3qvthZoLIJN86AEVCHUhKIc3OMmRUdMVCm%2Bkq70SzBJQ%3D%3D"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
-        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("50", "UTF-8")); /*한 페이지 결과 수*/
         urlBuilder.append("&" + URLEncoder.encode("_type","UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /*데이터 타입(xml, json)*/
         urlBuilder.append("&" + URLEncoder.encode("depPlaceId","UTF-8") + "=" + URLEncoder.encode(departStationCode, "UTF-8")); /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
         urlBuilder.append("&" + URLEncoder.encode("arrPlaceId","UTF-8") + "=" + URLEncoder.encode(arriveStationCode, "UTF-8")); /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
@@ -445,7 +445,12 @@ public class TrainService {
             apiVo.setArrplandtime(apiVo.getArrplandtime().substring(8));
             apiVo.setDepplandtime(apiVo.getDepplandtime().substring(8));
 
-
+            if(apiVo.getArrplacename().equals("지제")){
+                apiVo.setArrplacename("평택지제");
+            }
+            if(apiVo.getDepplacename().equals("지제")){
+                apiVo.setDepplacename("평택지제");
+            }
             resultVo.add(apiVo);
         }
         pair.setKey(CommonResult.SUCCESS);
