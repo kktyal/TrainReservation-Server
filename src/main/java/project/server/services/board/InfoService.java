@@ -1,16 +1,16 @@
 package project.server.services.board;
 
 import org.springframework.stereotype.Service;
-import project.server.entities.board.BoardEntity;
-import project.server.mappers.board.IBoardMapper;
+import project.server.entities.info.BoardEntity;
+import project.server.mappers.info.IInfoMapper;
 
 import java.util.List;
 
 @Service
-public class BoardService {
-    private final IBoardMapper boardMapper;//변수로 만들때 I는 빼고 만드는게 국룰
+public class InfoService {
+    private final IInfoMapper boardMapper;//변수로 만들때 I는 빼고 만드는게 국룰
 
-    public BoardService(IBoardMapper boardMapper) {
+    public InfoService(IInfoMapper boardMapper) {
         this.boardMapper = boardMapper;
     }
 

@@ -1,7 +1,7 @@
-package project.server.vos.board;
+package project.server.vos.info;
 
 import lombok.Data;
-import project.server.entities.board.BoardEntity;
+import project.server.entities.info.BoardEntity;
 @Data
 public class BoardVo extends BoardEntity {
     private String search;

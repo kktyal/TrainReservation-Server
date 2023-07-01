@@ -1,14 +1,13 @@
-package project.server.mappers.board;
+package project.server.mappers.info;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import project.server.entities.board.BoardEntity;
-import project.server.vos.board.BoardVo;
+import project.server.entities.info.BoardEntity;
 
 import java.util.List;
 
 @Mapper
-public interface IBoardMapper {
+public interface IInfoMapper {
 
     @Select("select `index`,`title`,`create_date` from `info`.`board`")
     List<BoardEntity> selectAll();

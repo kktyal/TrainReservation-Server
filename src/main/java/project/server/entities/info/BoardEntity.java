@@ -1,4 +1,4 @@
-package project.server.entities.board;
+package project.server.entities.info;
 
 import lombok.Data;
 
