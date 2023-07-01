@@ -74,6 +74,8 @@ public class TrainService {
         Pair<Enum<? extends IResult>, Integer> pair = new Pair<>(null, null);
         PaymentEntity payment = new PaymentEntity();
 
+
+
         // 총 금액을 알기 위해 ticket에서 age, price 조회
         int totalPrice = 0;
         List<TicketEntity> ticketEntities = trainMapper.selectTicketByReservationId(reservationEntity.getReservationId());

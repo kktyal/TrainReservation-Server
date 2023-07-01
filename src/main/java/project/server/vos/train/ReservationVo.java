@@ -4,8 +4,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import project.server.entities.train.ReservationEntity;
 
-@Data
+
 //@EqualsAndHashCode(callSuper = true)
+@Data
 public class ReservationVo extends ReservationEntity {
     private Integer trainNo;
     private Integer carriage;

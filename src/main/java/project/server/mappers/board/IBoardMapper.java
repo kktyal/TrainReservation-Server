@@ -10,13 +10,13 @@ import java.util.List;
 @Mapper
 public interface IBoardMapper {
 
-    @Select("select `index`,`title`,`create_date` from `board`")
+    @Select("select `index`,`title`,`create_date` from `info`.`board`")
     List<BoardEntity> selectAll();
 
-    @Select("select * from `board` where `title` like '%${title}%' or `content` like '%${title}%'")
+    @Select("select * from `info`.`board` where `title` like '%${title}%' or `content` like '%${title}%'")
     List<BoardEntity> selectBySearch(String search);
 
-    @Select("select * from `board` where `index` = ${index}")
+    @Select("select * from `info`.`board` where `index` = ${index}")
     List<BoardEntity> selectByIndex(int index);
 
 }

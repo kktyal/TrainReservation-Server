@@ -32,7 +32,13 @@ public class TrainController extends MyController {
 
     @Autowired
     private TrainService trainService;
-
+    @ResponseBody
+    @PostMapping("/testtest")
+    public String testtest() {
+        Date date = new Date();
+        System.out.println("date = " + date);
+        return date.toString();
+    }
 
 
 

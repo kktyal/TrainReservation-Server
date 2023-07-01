@@ -5,17 +5,17 @@
 <mapper namespace="project.server.mappers.member.IMemberMapper">
 
     <insert id="test">
-        insert into `member_email_auth`
+        insert into `member`.`member_email_auth`
         values ('test', 'test');
     </insert>
 
     <update id="updateEmailAuth">
-        update member_email_auth
+        update `member`.member_email_auth
         set expired_flag = #{isExpired}
         where `email` = #{email}
     </update>
     <insert id="insertAuthCode">
-        insert into `member_email_auth`
+        insert into `member`.`member_email_auth`
         values (#{email}, #{authCode}, #{createdOn}, #{expiresOn}, #{isExpired})
         on duplicate key update `auth_code`= values(`auth_code`),
                                 `created_on`=values(`created_on`),
@@ -25,45 +25,45 @@
 
     <select id="matchEmailCode" resultType="MemberAuthCodeEntity">
         select *
-        from `member_email_auth`
+        from `member`.`member_email_auth`
         where `email` = #{email}
     </select>
 
 
     <select id="findById" resultType="MemberVo">
         select *
-        from `member`
+        from `member`.`member`
         where `id` = #{id}
     </select>
 
     <select id="findByEmail" resultType="MemberVo">
         select *
-        from `member`
+        from `member`.`member`
         where `email` = #{email}
     </select>
 
     <select id="findByPhone" resultType="MemberVo">
         select *
-        from `member`
+        from `member`.`member`
         where `phone` = #{phone}
     </select>
 
     <select id="findByEmailAndId" resultType="MemberVo">
         select *
-        from `member`
+        from `member`.`member`
         where `id` = #{id}
           and `email` = #{email}
     </select>
 
     <update id="updatePw">
-        update `member`
+        update `member`.`member`
         set `pw` = #{pw}
         where `id` = #{id}
     </update>
 
 
     <insert id="save">
-        insert into member (`id`, `email`, `phone`, `pw`, `name`, `gender`, `birth`,`is_admin`)
+        insert into `member`.member (`id`, `email`, `phone`, `pw`, `name`, `gender`, `birth`,`is_admin`)
             value (#{id}, #{email}, #{phone}, #{pw}, #{name},#{gender},#{birth},#{isAdmin})
     </insert>
 

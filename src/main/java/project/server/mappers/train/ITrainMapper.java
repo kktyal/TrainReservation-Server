@@ -11,10 +11,10 @@ import java.util.Optional;
 
 @Mapper
 public interface ITrainMapper {
-    @Select("select member_id from good.`reservation` ")
+    @Select("select member_id from `train`.`reservation` ")
     List<ReservationEntity> test();
 
-    @Select("select * from `age`")
+//    @Select("select * from `train`.`age`")
     List<AgeEntity>selectAge();
 
     Optional<TrainStationEntity>findByName(String name);
@@ -33,12 +33,12 @@ public interface ITrainMapper {
     List<String> selectPremiumSeats();
 
 
-    @Select("select `station_name` from `train_station`")
+//    @Select("select `station_name` from `train`.`train_station`")
     List<String> selectTrainStations();
-    @Select("select `train_no` from `train_no`")
+//    @Select("select `train_no` from `train`.`train_no`")
     List<Integer> selectTrainNos();
 
-    @Select(" select count(`reservation_id`) from `reservation` where `member_id` = #{memberId}")
+//    @Select(" select count(`reservation_id`) from `train`.`reservation` where `member_id` = #{memberId}")
     int selectReservationCntByMemberId(Integer memberId);
     int saveReservation(ReservationEntity reservation);
     int saveTicket(TicketEntity ticket);
