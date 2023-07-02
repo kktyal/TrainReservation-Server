@@ -212,6 +212,8 @@
                `r`.`arrive_time`,
                `r`.`depart_station`,
                `r`.`depart_time`,
+               `r`.`created_date`,
+               `r`.`reservation_id`,
                `r`.`expired_date`,
                count(`t`.`seat`) as `ticketCnt`,
                `t`.`train_no`
