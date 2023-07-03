@@ -57,7 +57,7 @@ public class TrainService {
         }
         Optional<ReservationEntity> isCanceled = trainMapper.selectReservationIdAndDisuse(input.getReservationId());
         if(isCanceled.isEmpty()){
-            return new Pair<>(CancelResult.IS_COMPLETED_CANCEL, null);
+            return new Pair<>(TrainResult.INVALID_RESERVATION_ID, null);
         }
 
         int result = trainMapper.updateCancelToReservation(input.getReservationId());
@@ -73,7 +73,7 @@ public class TrainService {
         }
         Optional<ReservationEntity> isRefund = trainMapper.selectReservationIdAndDisuse(input.getReservationId());
         if(isRefund.isEmpty()){
-            return new Pair<>(RefundResult.IS_COMPLETED_REFUND, null);
+            return new Pair<>(TrainResult.INVALID_RESERVATION_ID, null);
         }
 
         int result = trainMapper.updateRefundToPayment(hasReservationId.get().getPaymentId());
