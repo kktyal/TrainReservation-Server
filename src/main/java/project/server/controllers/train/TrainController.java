@@ -199,7 +199,7 @@ public class TrainController extends MyController {
         }
 
         Pair<Enum<? extends IResult>, Integer> result = trainService.refund(inputVo);
-        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
+        return Utils.getJsonObject(result.getKey()).toString();
     }
 
     // 예약 취소
@@ -212,7 +212,7 @@ public class TrainController extends MyController {
         }
 
         Pair<Enum<? extends IResult>, Integer> result = trainService.cancel(inputVo);
-        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
+        return Utils.getJsonObject(result.getKey()).toString();
     }
 
     //결제하기
@@ -226,7 +226,7 @@ public class TrainController extends MyController {
 
         Pair<Enum<? extends IResult>, Integer> result = trainService.payment(reservationId);
 
-        return Utils.getJsonObject(result.getKey(), result.getValue()).toString();
+        return Utils.getJsonObject(result.getKey()).toString();
     }
 
     //예약내역 페이지

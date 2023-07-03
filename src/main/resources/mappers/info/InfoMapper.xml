@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project.server.mappers.info.IInfoMapper">
+
+    <select id="selectEnquiry" resultType="EnquiryVo">
+        select `e`.`index`, `e`.`title`, `e`.`create_date`, `e`.`author`, ifnull(`a`.`index`, 0) as `answered`
+        from `info`.`enquiry` as `e`
+                 left join `info`.`answer` as `a`
+                           on `e`.`index` = `a`.`enquiry_index`
+        <where>
+            <if test = "id != null">
+                `e`.`author` = #{id}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectEnquiryBySearch" resultType="EnquiryVo">
+        SELECT `e`.`index`, `e`.`title`, `e`.`create_date`, `e`.`author`, IFNULL(`a`.`index`, 0) AS `answered`
+        FROM `info`.`enquiry` AS `e`
+        LEFT JOIN `info`.`answer` AS `a` ON `e`.`index` = `a`.`enquiry_index`
+        <if test="search != null">
+            WHERE (`e`.`author` = #{search}
+            OR `e`.`title` LIKE CONCAT('%', #{search}, '%')
+            OR `e`.`content` LIKE CONCAT('%', #{search}, '%'))
+        </if>
+    </select>
+    <select id="selectEnquiryByIndex" resultType="EnquiryVo">
+        select *
+        from `info`.`enquiry`
+        where `index` = #{index}
+    </select>
+    <select id="selectAnswerByIndex" resultType="AnswerEntity">
+        select `index`, `enquiry_index`, `answer`, `create_date`, `update_date`, `author`
+        from `info`.`answer`
+        where `enquiry_index` = #{index}
+          and `is_deleted` = 0
+    </select>
+
+    <insert id="insertEnquiry" useGeneratedKeys="true" keyProperty="index" >
+        insert into `info`.`enquiry` (`title`, `content`, `create_date`, `author`)
+        values(#{title},#{content},#{createDate},#{author})
+    </insert>
+</mapper>

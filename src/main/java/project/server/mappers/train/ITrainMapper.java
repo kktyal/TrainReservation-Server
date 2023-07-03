@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Select;
 import project.server.entities.train.*;
 import project.server.vos.train.*;
 
+import javax.swing.text.html.Option;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public interface ITrainMapper {
     Optional<ReservationEntity> selectReservationId(String id);
     Optional<TicketEntity> selectTicketId(String id);
     Optional<PaymentEntity> selectPaymentId(String id);
+    Optional<ReservationEntity> selectIsPayment (String id);
 
     List<ReservationVo> findSoldSeat(ApiVo apiVo);
     List<TrainTimeVo> selectTime(int trainNo);

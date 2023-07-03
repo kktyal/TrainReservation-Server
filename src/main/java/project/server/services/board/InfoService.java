@@ -1,11 +1,14 @@
 package project.server.services.board;
 
 import org.springframework.stereotype.Service;
+import project.server.entities.info.AnswerEntity;
 import project.server.entities.info.BoardEntity;
 import project.server.entities.info.EnquiryEntity;
 import project.server.mappers.info.IInfoMapper;
 import project.server.vos.info.EnquiryVo;
+import project.server.vos.member.MemberVo;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -26,14 +29,27 @@ public class InfoService {
         return boardMapper.selectByIndex(index);
     }
 
-    public List<EnquiryVo> findEnquiryAll(){
-        return boardMapper.selectEnquiryAll();
+
+    public List<EnquiryVo> findEnquiry(MemberVo member){
+        return boardMapper.selectEnquiry(member);
     }
-    public List<EnquiryVo> findEnquiryByMemberId(int memberId){
-        return boardMapper.selectEnquiryByMemberId(memberId);
+    public List<EnquiryVo> findEnquiryBySearch (String input){
+
+        return boardMapper.selectEnquiryBySearch(input);
+    }
+    public List<EnquiryVo> findEnquiryByIndex (int index){
+        return boardMapper.selectEnquiryByIndex(index);
+    }
+    public List<AnswerEntity> findAnswerByIndex (int index){
+        return boardMapper.selectAnswerByIndex(index);
+    }
+    public int enquiryInsert(int id, EnquiryEntity input){
+
+        Date date = new Date();
+        input.setCreateDate(date);
+        input.setAuthor(id);
+        return boardMapper.insertEnquiry(input);
     }
 
-//    public int isExist(int index){
-//        return boardMapper.selectAnswer(index);
-//    }
+
 }

@@ -20,9 +20,7 @@ import project.server.vos.member.MemberVo;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 
 @Slf4j
@@ -177,12 +175,8 @@ public class MemberController extends MyController {
 
         }
 
-
-
-
-
         return Utils.getJsonObject(result.getKey()).toString();
     }
-
+    //todo: 관리자인지 아닌지 묻기
 
 }

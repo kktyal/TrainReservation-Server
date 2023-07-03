@@ -3,17 +3,18 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="project.server.mappers.train.ITrainMapper">
+
     <select id="selectStandardSeats" resultType="String">
         select `seat`
         from `train`.`train_seat`
         where `carriage` = 1
     </select>
+
     <select id="selectPremiumSeats" resultType="String">
         select `seat`
         from `train`.`train_seat`
         where `carriage` = 2
     </select>
-
 
 <!--    <select id="test" resultType="int">-->
 <!--        select `index`-->
@@ -21,13 +22,11 @@
 <!--        where `station_name` = '수서'-->
 <!--    </select>-->
 
-
     <select id="selectTicketByReservationId" resultType="TicketEntity">
         select *
         from `train`.`ticket`
         where `reservation_id` = #{reservationId}
     </select>
-
 
     <select id="findByName" resultType="TrainStationEntity">
         select `index`, `station_name`, `station_code`
@@ -47,7 +46,6 @@
                                                 or (`r`.`payment_id` is null and `expired_date` > #{nowDate})) as `sub`)
         ]]>
     </update>
-
 
     <!--    <update id="updateDisuse"><![CDATA[-->
     <!--        update `good`.`reservation`-->
@@ -128,11 +126,13 @@
         where `reservation_id` = #{id}
           and `disuse` = 0
     </select>
+
     <select id="selectTicketId" resultType="TicketEntity">
         select *
         from `train`.`ticket`
         where `ticket_id` = #{id}
     </select>
+
     <select id="selectPaymentId" resultType="PaymentEntity">
         select *
         from `train`.`payment`
@@ -225,6 +225,12 @@
 
     </select>
 
+    <select id="selectIsPayment" resultType="ReservationEntity">
+        select *
+        from `train`.`reservation`
+        where `reservation_id` = #{id}
+          and `payment_id` is null;
+    </select>
 
 </mapper>
 

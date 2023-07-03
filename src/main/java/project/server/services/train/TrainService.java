@@ -14,6 +14,7 @@ import project.server.entities.train.*;
 import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
 import project.server.enums.trainResult.InquiryResult;
+import project.server.enums.trainResult.PaymentResult;
 import project.server.enums.trainResult.ReservationResult;
 import project.server.enums.trainResult.TrainResult;
 import project.server.mappers.train.ITrainMapper;
@@ -53,8 +54,13 @@ public class TrainService {
     }
 
     public Pair<Enum<? extends IResult>, Integer> cancel(ReservationVo inputVo) {
-
+        Optional<ReservationEntity> reservationEntity = trainMapper.selectReservationId(inputVo.getReservationId());
+        if (reservationEntity.isEmpty()) {
+            System.out.println("123");
+            return new Pair<>(TrainResult.NO_SEARCH_DATA, null);
+        }
         int result = trainMapper.updateCancelToReservation(inputVo.getReservationId());
+        disuse();
         return Utils.getIngegerPair(result);
     }
 
@@ -62,19 +68,26 @@ public class TrainService {
 
         Optional<ReservationEntity> reservationEntity = trainMapper.selectReservationId(inputVo.getReservationId());
         if (reservationEntity.isEmpty()) {
-
+            System.out.println("123");
             return new Pair<>(TrainResult.NO_SEARCH_DATA, null);
         }
         int result = trainMapper.updateRefundToPayment(reservationEntity.get().getPaymentId());
+        disuse();
         return Utils.getIngegerPair(result);
     }
 
     @Transactional
     public Pair<Enum<? extends IResult>, Integer> payment(ReservationEntity reservationEntity) {
         Pair<Enum<? extends IResult>, Integer> pair = new Pair<>(null, null);
+
+        Optional<ReservationEntity> isPayment = trainMapper.selectIsPayment(reservationEntity.getReservationId());
+        if(isPayment.isEmpty()){
+            pair.setKey(PaymentResult.IS_COMPLETED_PAYMENT);
+            return pair;
+        }
+
+
         PaymentEntity payment = new PaymentEntity();
-
-
 
         // 총 금액을 알기 위해 ticket에서 age, price 조회
         int totalPrice = 0;
