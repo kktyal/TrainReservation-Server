@@ -124,8 +124,14 @@
         select *
         from `train`.`reservation`
         where `reservation_id` = #{id}
+    </select>
+    <select id="selectReservationIdAndDisuse" resultType="ReservationEntity">
+        select *
+        from `train`.`reservation`
+        where `reservation_id` = #{id}
           and `disuse` = 0
     </select>
+
 
     <select id="selectTicketId" resultType="TicketEntity">
         select *

@@ -21,6 +21,7 @@ public interface ITrainMapper {
     Optional<TrainStationEntity>findByName(String name);
     Optional<TrainChargeEntity> selectCharge(TrainChargeVo trainChargeVo);
     Optional<ReservationEntity> selectReservationId(String id);
+    Optional<ReservationEntity> selectReservationIdAndDisuse(String id);
     Optional<TicketEntity> selectTicketId(String id);
     Optional<PaymentEntity> selectPaymentId(String id);
     Optional<ReservationEntity> selectIsPayment (String id);

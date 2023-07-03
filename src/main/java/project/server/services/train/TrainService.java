@@ -13,10 +13,7 @@ import project.server.ServerApplication;
 import project.server.entities.train.*;
 import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
-import project.server.enums.trainResult.InquiryResult;
-import project.server.enums.trainResult.PaymentResult;
-import project.server.enums.trainResult.ReservationResult;
-import project.server.enums.trainResult.TrainResult;
+import project.server.enums.trainResult.*;
 import project.server.mappers.train.ITrainMapper;
 import project.server.vos.train.*;
 
@@ -53,34 +50,48 @@ public class TrainService {
         return trainMapper.test();
     }
 
-    public Pair<Enum<? extends IResult>, Integer> cancel(ReservationVo inputVo) {
-        Optional<ReservationEntity> reservationEntity = trainMapper.selectReservationId(inputVo.getReservationId());
-        if (reservationEntity.isEmpty()) {
-            System.out.println("123");
+    public Pair<Enum<? extends IResult>, Integer> cancel(ReservationVo input) {
+        Optional<ReservationEntity> hasReservationId = trainMapper.selectReservationId(input.getReservationId());
+        if (hasReservationId.isEmpty()) {
             return new Pair<>(TrainResult.NO_SEARCH_DATA, null);
         }
-        int result = trainMapper.updateCancelToReservation(inputVo.getReservationId());
+        Optional<ReservationEntity> isCanceled = trainMapper.selectReservationIdAndDisuse(input.getReservationId());
+        if(isCanceled.isEmpty()){
+            return new Pair<>(CancelResult.IS_COMPLETED_CANCEL, null);
+        }
+
+        int result = trainMapper.updateCancelToReservation(input.getReservationId());
         disuse();
         return Utils.getIngegerPair(result);
     }
 
-    public Pair<Enum<? extends IResult>, Integer> refund(ReservationVo inputVo) {
+    public Pair<Enum<? extends IResult>, Integer> refund(ReservationVo input) {
 
-        Optional<ReservationEntity> reservationEntity = trainMapper.selectReservationId(inputVo.getReservationId());
-        if (reservationEntity.isEmpty()) {
-            System.out.println("123");
+        Optional<ReservationEntity> hasReservationId = trainMapper.selectReservationId(input.getReservationId());
+        if (hasReservationId.isEmpty()) {
             return new Pair<>(TrainResult.NO_SEARCH_DATA, null);
         }
-        int result = trainMapper.updateRefundToPayment(reservationEntity.get().getPaymentId());
+        Optional<ReservationEntity> isRefund = trainMapper.selectReservationIdAndDisuse(input.getReservationId());
+        if(isRefund.isEmpty()){
+            return new Pair<>(RefundResult.IS_COMPLETED_REFUND, null);
+        }
+
+        int result = trainMapper.updateRefundToPayment(hasReservationId.get().getPaymentId());
         disuse();
         return Utils.getIngegerPair(result);
     }
 
     @Transactional
-    public Pair<Enum<? extends IResult>, Integer> payment(ReservationEntity reservationEntity) {
+    public Pair<Enum<? extends IResult>, Integer> payment(ReservationEntity input) {
         Pair<Enum<? extends IResult>, Integer> pair = new Pair<>(null, null);
 
-        Optional<ReservationEntity> isPayment = trainMapper.selectIsPayment(reservationEntity.getReservationId());
+        Optional<ReservationEntity> hasReservationId = trainMapper.selectReservationId(input.getReservationId());
+        if (hasReservationId.isEmpty()) {
+            return new Pair<>(TrainResult.NO_SEARCH_DATA, null);
+        }
+        
+
+        Optional<ReservationEntity> isPayment = trainMapper.selectIsPayment(input.getReservationId());
         if(isPayment.isEmpty()){
             pair.setKey(PaymentResult.IS_COMPLETED_PAYMENT);
             return pair;
@@ -91,7 +102,7 @@ public class TrainService {
 
         // 총 금액을 알기 위해 ticket에서 age, price 조회
         int totalPrice = 0;
-        List<TicketEntity> ticketEntities = trainMapper.selectTicketByReservationId(reservationEntity.getReservationId());
+        List<TicketEntity> ticketEntities = trainMapper.selectTicketByReservationId(input.getReservationId());
         for (TicketEntity ticketEntity : ticketEntities) {
            totalPrice+=ticketEntity.getDiscountedPrice();
         }
@@ -107,8 +118,8 @@ public class TrainService {
         payment.setCreatedDate(createdDate);
         int savePaymentResult = trainMapper.savePayment(payment);
 
-        reservationEntity.setPaymentId(paymentId);
-        int updateReservationPaymentIdResult = trainMapper.updateReservationPaymentId(reservationEntity);
+        input.setPaymentId(paymentId);
+        int updateReservationPaymentIdResult = trainMapper.updateReservationPaymentId(input);
         if (savePaymentResult == 1 && updateReservationPaymentIdResult == 1) {
             pair.setKey(CommonResult.SUCCESS);
             pair.setValue(savePaymentResult + updateReservationPaymentIdResult);
