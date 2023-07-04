@@ -218,17 +218,19 @@
                `r`.`arrive_time`,
                `r`.`depart_station`,
                `r`.`depart_time`,
-               `r`.`created_date` as `formattingCreatedDate`,
+               `r`.`created_date` as `formattedCreatedDate`,
                `r`.`reservation_id`,
-               `r`.`expired_date` as `formattingExpiredDate`,
+               `r`.`expired_date` as `formattedExpiredDate`,
                `r`.`payment_id`,
-               count(`t`.`seat`) as `ticketCnt`,
+               count(`t`.`seat`)  as `ticketCnt`,
                `t`.`train_no`
         from `train`.`reservation` as `r`
                  left join `train`.`ticket` as `t` on `r`.`reservation_id` = `t`.`reservation_id`
         where `r`.`member_id` = #{memberId}
           and `r`.`disuse` = 0
-        group by `r`.`reservation_id`
+        group by `r`.`reservation_id`, `r`.`date`, `r`.`depart_time`, `r`.`payment_id`
+        order by case when `r`.`payment_id` is null then 0 else 1 end, `r`.`date`, `r`.`depart_time`
+
 
     </select>
 

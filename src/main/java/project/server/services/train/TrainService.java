@@ -278,6 +278,7 @@ public class TrainService {
         disuse();
         List<ReservationVo> result = trainMapper.selectReservationByMemberId(memberId);
 
+
         return Utils.getListPair(result);
     }
 
@@ -494,7 +495,7 @@ public class TrainService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 
-        return currentDate.format(formatter).concat(uuid.toString()).replaceAll("-", "");
+        return currentDate.format(formatter).concat(uuid.toString()).replaceAll("-", "").substring(0,16);
     }
 
     public void disuse() {

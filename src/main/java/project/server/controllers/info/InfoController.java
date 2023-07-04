@@ -128,6 +128,7 @@ public class InfoController extends MyController {
         input.setAuthor(memberVo.getId());
 
 
+
         Pair<Enum<? extends IResult>, Integer> result = infoService.answerInsert(input);
 
         return Utils.getJsonObject(result.getKey()).toString();

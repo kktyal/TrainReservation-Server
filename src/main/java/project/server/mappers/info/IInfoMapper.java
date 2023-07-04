@@ -38,4 +38,5 @@ public interface IInfoMapper {
 
     Optional<AnswerEntity> isAnswered(int index);
 
+
 }

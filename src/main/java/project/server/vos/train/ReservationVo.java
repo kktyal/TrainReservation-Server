@@ -16,7 +16,7 @@ public class ReservationVo extends ReservationEntity {
     private Integer discountedPrice;
     private Integer ticketCnt;
     private String ticketId;
-    private String formattingCreatedDate;
-    private String formattingExpiredDate;
+    private String formattedCreatedDate;
+    private String formattedExpiredDate;
 
 }

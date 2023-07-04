@@ -8,7 +8,7 @@ public enum TrainValidator implements Validator {
     TIME("^(0[0-9]|1[0-9]|2[0-3])(0[1-9]|[0-5][0-9])(0[1-9]|[0-5][0-9])$"),
     CARRIAGE("^[12]$"),
     SEAT("^\\d[A-Z]"),
-    RESERVATIONID("^.{40}$");
+    RESERVATIONID("^.{16}$");
 
 
 
