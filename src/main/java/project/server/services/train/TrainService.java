@@ -22,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -407,16 +408,16 @@ public class TrainService {
 //                "&" + URLEncoder.encode("depPlandTime", "UTF-8") + "=" + URLEncoder.encode(cntVo.getDate(), "UTF-8") + /*출발일(YYYYMMDD)*/
 //                "&" + URLEncoder.encode("trainGradeCode", "UTF-8") + "=" + URLEncoder.encode("17", "UTF-8"); /*차량종류코드*/
 //        URL url = new URL(urlBuilder);
-        StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo"); /*URL*/
-        urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=Gcqxaud5Om2bmKrfPZ29wv5Ri2exsBYPXbPm%2BNCLjb3qvthZoLIJN86AEVCHUhKIc3OMmRUdMVCm%2Bkq70SzBJQ%3D%3D"); /*Service Key*/
-        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
-        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("50", "UTF-8")); /*한 페이지 결과 수*/
-        urlBuilder.append("&" + URLEncoder.encode("_type","UTF-8") + "=" + URLEncoder.encode("json", "UTF-8")); /*데이터 타입(xml, json)*/
-        urlBuilder.append("&" + URLEncoder.encode("depPlaceId","UTF-8") + "=" + URLEncoder.encode(departStationCode, "UTF-8")); /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
-        urlBuilder.append("&" + URLEncoder.encode("arrPlaceId","UTF-8") + "=" + URLEncoder.encode(arriveStationCode, "UTF-8")); /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
-        urlBuilder.append("&" + URLEncoder.encode("depPlandTime","UTF-8") + "=" + URLEncoder.encode(cntVo.getDate(), "UTF-8")); /*출발일(YYYYMMDD)*/
-        urlBuilder.append("&" + URLEncoder.encode("trainGradeCode","UTF-8") + "=" + URLEncoder.encode("17", "UTF-8")); /*차량종류코드*/
-        URL url = new URL(urlBuilder.toString());
+        /*URL*/
+        String urlBuilder = "http://apis.data.go.kr/1613000/TrainInfoService/getStrtpntAlocFndTrainInfo" + "?" + URLEncoder.encode("serviceKey", StandardCharsets.UTF_8) + "=Gcqxaud5Om2bmKrfPZ29wv5Ri2exsBYPXbPm%2BNCLjb3qvthZoLIJN86AEVCHUhKIc3OMmRUdMVCm%2Bkq70SzBJQ%3D%3D" + /*Service Key*/
+                "&" + URLEncoder.encode("pageNo", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("1", StandardCharsets.UTF_8) + /*페이지번호*/
+                "&" + URLEncoder.encode("numOfRows", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("50", StandardCharsets.UTF_8) + /*한 페이지 결과 수*/
+                "&" + URLEncoder.encode("_type", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("json", StandardCharsets.UTF_8) + /*데이터 타입(xml, json)*/
+                "&" + URLEncoder.encode("depPlaceId", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(departStationCode, StandardCharsets.UTF_8) + /*출발기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
+                "&" + URLEncoder.encode("arrPlaceId", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(arriveStationCode, StandardCharsets.UTF_8) + /*도착기차역ID [상세기능3. 시/도별 기차역 목록조회]에서 조회 가능*/
+                "&" + URLEncoder.encode("depPlandTime", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(cntVo.getDate(), StandardCharsets.UTF_8) + /*출발일(YYYYMMDD)*/
+                "&" + URLEncoder.encode("trainGradeCode", StandardCharsets.UTF_8) + "=" + URLEncoder.encode("17", StandardCharsets.UTF_8); /*차량종류코드*/
+        URL url = new URL(urlBuilder);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
