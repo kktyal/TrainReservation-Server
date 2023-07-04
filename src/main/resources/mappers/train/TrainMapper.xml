@@ -16,10 +16,10 @@
         where `carriage` = 2
     </select>
 
-<!--    <select id="test" resultType="int">-->
-<!--        select `index`-->
-<!--        from `train_station`-->
-<!--        where `station_name` = '수서'-->
+<!--    <select id="test1" resultType="String">-->
+<!--        select `created_date`-->
+<!--        from `train`.`reservation`-->
+<!--        limit 1-->
 <!--    </select>-->
 
     <select id="selectTicketByReservationId" resultType="TicketEntity">
@@ -221,6 +221,7 @@
                `r`.`created_date`,
                `r`.`reservation_id`,
                `r`.`expired_date`,
+               `r`.`payment_id`,
                count(`t`.`seat`) as `ticketCnt`,
                `t`.`train_no`
         from `train`.`reservation` as `r`

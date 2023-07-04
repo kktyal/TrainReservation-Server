@@ -7,4 +7,5 @@ import project.server.entities.info.EnquiryEntity;
 public class EnquiryVo extends EnquiryEntity {
     private int answered;
     private String search;
+    private Integer id;
 }

@@ -12,8 +12,8 @@ import java.util.Optional;
 
 @Mapper
 public interface ITrainMapper {
-    @Select("select member_id from `train`.`reservation` ")
-    List<ReservationEntity> test();
+    @Select(" select `created_date` from `train`.`reservation` limit 1")
+    String test();
 
 //    @Select("select * from `train`.`age`")
     List<AgeEntity>selectAge();

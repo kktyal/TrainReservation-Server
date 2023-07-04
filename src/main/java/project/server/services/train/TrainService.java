@@ -46,7 +46,7 @@ public class TrainService {
 //        return trainMapper.selectReservationId("20230613");
 //    }
 
-    public List<ReservationEntity> test(){
+    public String test(){
         return trainMapper.test();
     }
 

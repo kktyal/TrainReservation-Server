@@ -9,6 +9,7 @@ import project.server.vos.info.EnquiryVo;
 import project.server.vos.member.MemberVo;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface IInfoMapper {
@@ -25,11 +26,16 @@ public interface IInfoMapper {
 
 
     List<EnquiryVo> selectEnquiry(MemberVo member);
-    List<EnquiryVo> selectEnquiryBySearch (String search);
+    List<EnquiryVo> selectEnquiryBySearch (EnquiryVo search);
     List<EnquiryVo> selectEnquiryByIndex(int index);
     List<AnswerEntity> selectAnswerByIndex (int index);
 
     int insertEnquiry(EnquiryEntity input);
+    int insertAnswer(AnswerEntity input);
+    int updateAnswer(AnswerEntity input);
+    int deleteAnswer(AnswerEntity input);
 
+
+    Optional<AnswerEntity> isAnswered(int index);
 
 }

@@ -160,7 +160,10 @@ public class MemberController extends MyController {
             if (!MemberValidator.EMAIL.matches(memberVo.getEmail())) {
                 return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
             }
+        } else{
+            return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();
         }
+
         Pair<Enum<? extends IResult>, MemberVo> result = memberService.login(memberVo);
         if (result.getKey().equals(CommonResult.SUCCESS)) {
             HttpSession session = request.getSession(true);

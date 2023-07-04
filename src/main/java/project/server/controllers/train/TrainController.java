@@ -23,6 +23,7 @@ import project.server.vos.train.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -36,7 +37,8 @@ public class TrainController extends MyController {
     @PostMapping("/testtest")
     public String testtest() {
         Date date = new Date();
-        System.out.println("date = " + date);
+
+        System.out.println("date = " + date.toString());
         return date.toString();
     }
 
@@ -45,7 +47,7 @@ public class TrainController extends MyController {
     @ResponseBody
     @PostMapping("/test")
     public String test() {
-        List<ReservationEntity> test = trainService.test();
+        String test = trainService.test();
         JSONObject result = new JSONObject();
         result.put("data",test);
         return result.toString();
