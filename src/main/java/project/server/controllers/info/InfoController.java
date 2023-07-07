@@ -14,6 +14,7 @@ import project.server.enums.SessionAuthorizedResult;
 import project.server.enums.interfaces.IResult;
 import project.server.lang.Pair;
 import project.server.services.info.InfoService;
+import project.server.vos.info.AnswerVo;
 import project.server.vos.info.BoardVo;
 import project.server.vos.info.EnquiryVo;
 import project.server.vos.member.MemberVo;
@@ -35,6 +36,8 @@ public class InfoController extends MyController {
         return "hello";
     }
 
+
+    //전체 공지사항 리스트 띄우기
     @ResponseBody
     @PostMapping("/board/select")
     public String selectAll() {
@@ -42,6 +45,8 @@ public class InfoController extends MyController {
         return Utils.getJsonObject(CommonResult.SUCCESS, selectAll).toString();
     }
 
+
+    // 검색하면 검색한 리스트만 띄우기 (제목 , 내용)
     @ResponseBody
     @PostMapping("/board/select/search")
     public String selectBySearch(@RequestBody BoardVo vo) {
@@ -49,6 +54,8 @@ public class InfoController extends MyController {
         return Utils.getJsonObject(CommonResult.SUCCESS, selectAll).toString();
     }
 
+
+    // 리스트의 게시물을 눌렀을때 누른 index의 제목과 내용 페이지
     @ResponseBody
     @PostMapping("/board/select/index")
     public String selectByIndex(@RequestBody BoardVo vo) {
@@ -57,7 +64,7 @@ public class InfoController extends MyController {
     }
 
 
-    //문의사항 조회, memberId 있으면 사용자 문의사항 조회, 없으면 전체 조회 todo : 세션 검증해서 로그인 없으면 no-session
+    //문의사항 조회, memberId 있으면 사용자 문의사항 조회, (관리자 로그인 시) 전체 조회 todo : 세션 검증해서 로그인 없으면 no-session
     @ResponseBody
     @PostMapping("/enquiry/select")
     public String enquirySelect(HttpServletRequest request) {
@@ -67,9 +74,6 @@ public class InfoController extends MyController {
         HttpSession session = request.getSession(false);
         MemberVo memberVo  = (MemberVo) session.getAttribute(SessionConst.LOGIN_MEMBER);
 
-        if (isAdmin(memberVo)) {
-            memberVo.setId(null);
-        }
 
         List<EnquiryVo> result = infoService.findEnquiry(memberVo);
         return Utils.getJsonObject(CommonResult.SUCCESS, result).toString();
@@ -100,7 +104,7 @@ public class InfoController extends MyController {
     @ResponseBody
     @PostMapping("/answer/select/index")
     public String answerSelectByIndex(@RequestBody AnswerEntity input) {
-        List<AnswerEntity> result = infoService.findAnswerByIndex(input.getEnquiryIndex());
+        List<AnswerVo> result = infoService.findAnswerByIndex(input.getEnquiryIndex());
         return Utils.getJsonObject(CommonResult.SUCCESS, result).toString();
     }
 
@@ -111,8 +115,8 @@ public class InfoController extends MyController {
         if (isSession(request)) return Utils.getJsonObject(SessionAuthorizedResult.MEMBER_NO_SESSION).toString();
         HttpSession session = request.getSession(false);
         MemberVo memberVo = (MemberVo) session.getAttribute(SessionConst.LOGIN_MEMBER);
-
-        input.setAuthor(memberVo.getId());
+        Integer id = memberVo.getId();
+        input.setAuthor(id);
 
         Pair<Enum<? extends IResult>, Integer> result = infoService.enquiryInsert(input);
         return Utils.getJsonObject(result.getKey()).toString();

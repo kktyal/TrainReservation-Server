@@ -214,7 +214,6 @@ public class MemberService {
     public Pair<Enum<? extends IResult>, MemberVo> login(MemberVo memberVo){
         memberVo.setPw(Utils.hashSha512(memberVo.getPw()));
 
-
         Pair<Enum<? extends IResult>, MemberVo> pair = new Pair<>(null,null);
 
         Optional<MemberVo> selectVo;
@@ -232,7 +231,6 @@ public class MemberService {
             pair.setKey(LoginResult.ID_NO_MATCH);
             return pair;
         }
-
 
         if (selectVo.get().getPw().equals(memberVo.getPw())) {
             pair.setKey(CommonResult.SUCCESS);

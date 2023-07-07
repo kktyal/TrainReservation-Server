@@ -10,7 +10,7 @@
                  left join `info`.`answer` as `a`
                            on `e`.`index` = `a`.`enquiry_index`
         <where>
-            <if test = "id != null">
+            <if test = "isAdmin != 1">
                 `e`.`author` = #{id}
             </if>
         </where>
@@ -33,12 +33,13 @@
     </select>
 
     <select id="selectEnquiryByIndex" resultType="EnquiryVo">
-        select *
-        from `info`.`enquiry`
-        where `index` = #{index}
+        select `e`.`index`, `title`, `content`, `e`.`create_date` as formattedCreatedDate, e.`author`, IFNULL(`a`.`index`, 0) AS `answered`
+        from `info`.`enquiry` as `e`
+                 LEFT JOIN `info`.`answer` AS `a` ON `e`.`index` = `a`.`enquiry_index`
+        where `e`.`index` = #{index}
     </select>
-    <select id="selectAnswerByIndex" resultType="AnswerEntity">
-        select `index`, `enquiry_index`, `answer`, `create_date`, `update_date`, `author`
+    <select id="selectAnswerByIndex" resultType="AnswerVo">
+        select `index`, `enquiry_index`, `answer`, `create_date` as formattedCreatedDate, `update_date` as formattedUpdatedDate, `author`
         from `info`.`answer`
         where `enquiry_index` = #{index}
           and `is_deleted` = 0

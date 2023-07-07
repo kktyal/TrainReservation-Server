@@ -10,6 +10,7 @@ import project.server.SessionConst;
 import project.server.controllers.MyController;
 import project.server.entities.member.MemberAuthCodeEntity;
 import project.server.enums.CommonResult;
+import project.server.enums.SessionAuthorizedResult;
 import project.server.enums.interfaces.IResult;
 import project.server.lang.Pair;
 import project.server.services.member.MemberService;
@@ -169,6 +170,7 @@ public class MemberController extends MyController {
             HttpSession session = request.getSession(true);
             session.setAttribute(SessionConst.LOGIN_MEMBER, result.getValue());
 
+
             JSONObject jsonObject = new JSONObject();
             int reservationCnt = trainService.selectReservationCntByMemberId(memberVo.getId());
             jsonObject.put("memberName", result.getValue().getName());
@@ -181,5 +183,19 @@ public class MemberController extends MyController {
         return Utils.getJsonObject(result.getKey()).toString();
     }
     //todo: 관리자인지 아닌지 묻기
+    @ResponseBody
+    @PostMapping("/isAdmin")
+    public String login(HttpServletRequest request) {
+        if (!authorizedLoginSession(request).equals(Utils.getJsonObject(CommonResult.SUCCESS).toString())) {
+            return Utils.getJsonObject(SessionAuthorizedResult.MEMBER_NO_SESSION).toString();
+        }
 
+        HttpSession session = request.getSession(false);
+        MemberVo memberVo = (MemberVo) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        if (memberVo.getIsAdmin()==0){
+            return Utils.getJsonObject(CommonResult.FAILURE).toString();
+        }else {
+            return Utils.getJsonObject(CommonResult.SUCCESS).toString();
+        }
+    }
 }

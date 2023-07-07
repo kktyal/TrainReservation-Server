@@ -8,4 +8,5 @@ public class EnquiryVo extends EnquiryEntity {
     private int answered;
     private String search;
     private Integer id;
+    private String formattedCreatedDate;
 }

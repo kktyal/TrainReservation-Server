@@ -9,6 +9,7 @@ import project.server.enums.info.AnswerInsertResult;
 import project.server.enums.interfaces.IResult;
 import project.server.lang.Pair;
 import project.server.mappers.info.IInfoMapper;
+import project.server.vos.info.AnswerVo;
 import project.server.vos.info.EnquiryVo;
 import project.server.vos.member.MemberVo;
 
@@ -51,7 +52,7 @@ public class InfoService {
         return infoMapper.selectEnquiryByIndex(index);
     }
 
-    public List<AnswerEntity> findAnswerByIndex(int index) {
+    public List<AnswerVo> findAnswerByIndex(int index) {
         return infoMapper.selectAnswerByIndex(index);
     }
 

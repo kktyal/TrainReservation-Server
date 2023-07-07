@@ -161,6 +161,7 @@
         select count(`reservation_id`)
         from `train`.`reservation`
         where `member_id` = #{memberId}
+        and `disuse` = 0
     </select>
     <insert id="saveReservation">
         insert into `train`.`reservation` (`reservation_id`, `depart_time`, `depart_station`, `arrive_time`,

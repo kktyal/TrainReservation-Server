@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Select;
 import project.server.entities.info.AnswerEntity;
 import project.server.entities.info.BoardEntity;
 import project.server.entities.info.EnquiryEntity;
+import project.server.vos.info.AnswerVo;
 import project.server.vos.info.EnquiryVo;
 import project.server.vos.member.MemberVo;
 
@@ -28,7 +29,7 @@ public interface IInfoMapper {
     List<EnquiryVo> selectEnquiry(MemberVo member);
     List<EnquiryVo> selectEnquiryBySearch (EnquiryVo search);
     List<EnquiryVo> selectEnquiryByIndex(int index);
-    List<AnswerEntity> selectAnswerByIndex (int index);
+    List<AnswerVo> selectAnswerByIndex (int index);
 
     int insertEnquiry(EnquiryEntity input);
     int insertAnswer(AnswerEntity input);

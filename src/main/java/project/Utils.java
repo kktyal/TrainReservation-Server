@@ -75,6 +75,7 @@ public class Utils {
 
         if (result.equals(CommonResult.SUCCESS)) {
             object.put("result", result.name().toLowerCase());
+
             object.put("data", data);
         } else {
             object.put("result", CommonResult.FAILURE.name().toLowerCase());
