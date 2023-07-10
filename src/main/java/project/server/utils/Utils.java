@@ -1,10 +1,10 @@
-package project;
+package project.server.utils;
 
 import org.json.JSONObject;
 import project.server.enums.CommonResult;
 import project.server.enums.interfaces.IResult;
 import project.server.enums.trainResult.TrainResult;
-import project.server.lang.Pair;
+import project.server.utils.lang.Pair;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;

@@ -1,24 +1,17 @@
 package project.server.controllers;
 
-import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import project.Utils;
+import project.server.utils.Utils;
 
-import project.server.SessionConst;
+import project.server.utils.SessionConst;
 import project.server.entities.member.MemberEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.SessionAuthorizedResult;
-import project.server.vos.member.MemberVo;
 import project.server.vos.train.CntVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.sql.SQLException;
-import java.util.NoSuchElementException;
 
 public class MyController {
 
@@ -86,53 +79,4 @@ public class MyController {
 
 
 
-//    @ExceptionHandler()
-//    public ResponseEntity<Object> SQLException(SQLException e) {
-//
-//        return exceptionReturn(e);
-//
-//    }
-//    @ExceptionHandler()
-//    public ResponseEntity<Object> NullPointerException(NullPointerException e) {
-//
-//        return exceptionReturn(e);
-//
-//    }
-//    @ExceptionHandler()
-//    public ResponseEntity<Object> NoSuchElementException(NoSuchElementException e) {
-//
-//        return exceptionReturn(e);
-//
-//    }
-//    @ExceptionHandler()
-//    public ResponseEntity<Object> Exception(Exception e) {
-//
-//        return exceptionReturn(e);
-//
-//    }
-//
-//    private static ResponseEntity<Object> exceptionReturn(Exception e) {
-//        String msg = "SYS_ERR: " + e.getMessage();
-//        StackTraceElement[] stack = e.getStackTrace();
-//        String errorMethod = "";
-//        for (StackTraceElement stackTraceElement : stack) {
-//            final String clsName = stackTraceElement.getClassName();
-//            if (!clsName.startsWith("project.server.services")) {
-//                continue;
-//            }
-//            errorMethod = clsName + "." + stackTraceElement.getMethodName();
-//            break;
-//        }
-//
-//        JSONObject result = new JSONObject();
-//        result.put("result", CommonResult.FAILURE.name().toLowerCase());
-//        result.put("message", msg);
-//        result.put("method", errorMethod);
-//        result.put("error", e.getClass());
-//
-//        return new ResponseEntity<>(
-//                result.toString(),
-//                HttpStatus.BAD_REQUEST
-//        );
-//    }
 }

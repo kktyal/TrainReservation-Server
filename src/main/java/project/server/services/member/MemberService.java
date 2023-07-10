@@ -4,13 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
-import project.Utils;
+import project.server.utils.Utils;
 import project.server.entities.member.MemberAuthCodeEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.DataBaseResult;
 import project.server.enums.member.*;
 import project.server.enums.interfaces.IResult;
-import project.server.lang.Pair;
+import project.server.utils.lang.Pair;
 import project.server.mappers.member.IMemberMapper;
 import project.server.vos.member.MemberVo;
 

@@ -5,9 +5,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import project.Utils;
+import project.server.utils.Utils;
 import project.server.ServerApplication;
-import project.server.SessionConst;
+import project.server.utils.SessionConst;
 import project.server.controllers.MyController;
 import project.server.entities.train.ReservationEntity;
 import project.server.entities.train.TrainChargeEntity;
@@ -15,7 +15,7 @@ import project.server.enums.CommonResult;
 import project.server.enums.SessionAuthorizedResult;
 import project.server.enums.interfaces.IResult;
 import project.server.enums.trainResult.ReservationResult;
-import project.server.lang.Pair;
+import project.server.utils.lang.Pair;
 import project.server.services.train.TrainService;
 import project.server.validators.train.TrainValidator;
 import project.server.vos.member.MemberVo;
@@ -23,7 +23,6 @@ import project.server.vos.train.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -33,14 +32,12 @@ public class TrainController extends MyController {
 
     @Autowired
     private TrainService trainService;
-    @ResponseBody
-    @PostMapping("/testtest")
-    public String testtest() {
-        Date date = new Date();
-
-        System.out.println("date = " + date.toString());
-        return date.toString();
-    }
+//    @ResponseBody
+//    @PostMapping("/testtest")
+//    public String testtest() {
+//        Date date = new Date();
+//        return date.toString();
+//    }
 
 
 

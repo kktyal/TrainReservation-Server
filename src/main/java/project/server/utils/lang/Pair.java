@@ -1,4 +1,4 @@
-package project.server.lang;
+package project.server.utils.lang;
 
 import java.util.Objects;
 
@@ -12,7 +12,6 @@ public class Pair<K,V> {
     }
 
     public Pair() {
-
     }
 
     public K getKey(){

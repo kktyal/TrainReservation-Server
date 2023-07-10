@@ -36,8 +36,8 @@ dependencies {
 	//json
 	implementation 'org.json:json:20230227'
 
-	//웹
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+		//웹
+		implementation 'org.springframework.boot:spring-boot-starter-web'
 
 	//시간
 	implementation 'org.apache.commons:commons-lang3:3.12.0'

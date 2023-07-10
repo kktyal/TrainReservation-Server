@@ -3,8 +3,8 @@ package project.server.controllers.info;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import project.Utils;
-import project.server.SessionConst;
+import project.server.utils.Utils;
+import project.server.utils.SessionConst;
 import project.server.controllers.MyController;
 import project.server.entities.info.AnswerEntity;
 import project.server.entities.info.BoardEntity;
@@ -12,7 +12,7 @@ import project.server.entities.info.EnquiryEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.SessionAuthorizedResult;
 import project.server.enums.interfaces.IResult;
-import project.server.lang.Pair;
+import project.server.utils.lang.Pair;
 import project.server.services.info.InfoService;
 import project.server.vos.info.AnswerVo;
 import project.server.vos.info.BoardVo;
@@ -130,8 +130,6 @@ public class InfoController extends MyController {
         MemberVo memberVo = (MemberVo) session.getAttribute(SessionConst.LOGIN_MEMBER);
         if (!isAdmin(memberVo)) return Utils.getJsonObject(SessionAuthorizedResult.NO_ADMIN_SESSION).toString();
         input.setAuthor(memberVo.getId());
-
-
 
         Pair<Enum<? extends IResult>, Integer> result = infoService.answerInsert(input);
 

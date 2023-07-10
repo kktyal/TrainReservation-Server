@@ -5,14 +5,14 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import project.Utils;
-import project.server.SessionConst;
+import project.server.utils.Utils;
+import project.server.utils.SessionConst;
 import project.server.controllers.MyController;
 import project.server.entities.member.MemberAuthCodeEntity;
 import project.server.enums.CommonResult;
 import project.server.enums.SessionAuthorizedResult;
 import project.server.enums.interfaces.IResult;
-import project.server.lang.Pair;
+import project.server.utils.lang.Pair;
 import project.server.services.member.MemberService;
 import project.server.services.train.TrainService;
 import project.server.validators.member.MemberValidator;
@@ -136,7 +136,7 @@ public class MemberController extends MyController {
     //비번 변경
     @ResponseBody
     @PostMapping("/updatePassword")
-    public String updatePw(@RequestBody MemberVo memberVo, HttpServletResponse response) {
+    public String updatePw(@RequestBody MemberVo memberVo) {
 
         if (!MemberValidator.ID.matches(memberVo.getId().toString())||!MemberValidator.PASSWORD.matches(memberVo.getPw())) {
             return Utils.getJsonObject(CommonResult.INPUT_ERROR).toString();

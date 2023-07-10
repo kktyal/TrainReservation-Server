@@ -8,7 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.Utils;
+import project.server.utils.Utils;
 import project.server.ServerApplication;
 import project.server.entities.train.*;
 import project.server.enums.CommonResult;
@@ -28,7 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Date;
 
-import project.server.lang.Pair;
+import project.server.utils.lang.Pair;
 
 @Service
 @Slf4j

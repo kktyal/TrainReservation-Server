@@ -1,4 +1,4 @@
-package project.server;
+package project.server.utils;
 
 public class SessionConst {
 

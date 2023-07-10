@@ -1,13 +1,13 @@
 package project.server.services.info;
 
 import org.springframework.stereotype.Service;
-import project.Utils;
+import project.server.utils.Utils;
 import project.server.entities.info.AnswerEntity;
 import project.server.entities.info.BoardEntity;
 import project.server.entities.info.EnquiryEntity;
 import project.server.enums.info.AnswerInsertResult;
 import project.server.enums.interfaces.IResult;
-import project.server.lang.Pair;
+import project.server.utils.lang.Pair;
 import project.server.mappers.info.IInfoMapper;
 import project.server.vos.info.AnswerVo;
 import project.server.vos.info.EnquiryVo;
