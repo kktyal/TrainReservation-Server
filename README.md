@@ -74,6 +74,3 @@ SRT Clone 프로젝트
 - 안드로이드 개발자 문서: https://developer.android.com/docs 
 - 코틀린 개발자 문서 : https://kotlinlang.org/docs/home.html
 
-10. 조언 및 자문
-- 김종희 강사
-- 박용현 강사
